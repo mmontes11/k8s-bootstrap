@@ -1,2 +1,2 @@
-# k8s-infrastructure
-Core infrastructure for my personal Kubernetes cluster
+# 🚀 k8s-infrastructure
+Kubernetes bootstrapping and core infrastructure for my personal Raspberry Pi cluster.
