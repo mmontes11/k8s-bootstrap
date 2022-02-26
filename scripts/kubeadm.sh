@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euox pipefail
+
 KUBERNETES_VERSION=1.22.7-00 
 
 apt update
