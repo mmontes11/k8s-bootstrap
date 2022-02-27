@@ -2,16 +2,17 @@
 
 set -euox pipefail
 
-apt update
-
-apt install ca-certificates curl gnupg lsb-release
-
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+CONTAINERD_VERSION=1.4.12
 
 apt update
+apt install libseccomp2
 
-apt install -y containerd.io
+wget https://github.com/containerd/containerd/releases/download/v${CONTAINERD_VERSION}/cri-containerd-cni-${CONTAINERD_VERSION}-linux-amd64.tar.gz
+
+sudo tar --no-overwrite-dir -C / -xzf cri-containerd-cni-${CONTAINERD_VERSION}-linux-amd64.tar.gz
+
+mkdir -p /etc/containerd
+cp config/containerd/config.toml /etc/containerd/config.toml
+
+systemctl daemon-reload
+systemctl start containerd
