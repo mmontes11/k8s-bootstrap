@@ -4,9 +4,10 @@ localAPIEndpoint:
   bindPort: 6443
 nodeRegistration:
   criSocket: /run/containerd/containerd.sock
+  taints: []
   # taints:
   #   - key: "node-role.kubernetes.io/master"
-  #     value: "master"
+  #     value: ""
   #     effect: "NoSchedule"
 ---
 apiVersion: kubeadm.k8s.io/v1beta3

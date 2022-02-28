@@ -2,6 +2,8 @@
 
 set -euox pipefail
 
+source ./scripts/lib.sh
+
 install_scripts=(
   "scripts/network.sh"
   "scripts/containerd.sh"
@@ -14,4 +16,9 @@ done
 
 kubeadm init --config=config/kubeadm/init-config.yaml
 
-source ./scripts/kubelet.sh
+USER=$(get_user)
+USER_HOME=$(get_user_home)
+
+mkdir -p $USER_HOME/.kube
+cp /etc/kubernetes/admin.conf $USER_HOME/.kube/config
+chown $(id -u $USER):$(id -g $USER) $USER_HOME/.kube/config
