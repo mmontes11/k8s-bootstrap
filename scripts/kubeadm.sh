@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euox pipefail
+set -euo pipefail
 
 KUBERNETES_VERSION=1.22.7-00 
 

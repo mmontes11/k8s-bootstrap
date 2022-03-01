@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euox pipefail
+set -euo pipefail
 
 cat <<EOF | tee /etc/modules-load.d/kubernetes.conf
 overlay

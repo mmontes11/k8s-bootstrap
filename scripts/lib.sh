@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euox pipefail
+set -euo pipefail
 
 function ensure_env_var() {
   if [ -z $1 ]; then
