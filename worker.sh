@@ -7,7 +7,7 @@ source ./scripts/lib.sh
 required_env_vars=(
   "API_SERVER_ENDPOINT"
   "TOKEN"
-  "DISCOVERY_TOKEN_HASH"
+  "CA_CERT_HASH"
 )
 
 for i in "${!required_env_vars[@]}"; do
@@ -15,9 +15,11 @@ for i in "${!required_env_vars[@]}"; do
 done
 
 install_scripts=(
+  "scripts/apt.sh"
   "scripts/network.sh"
   "scripts/containerd.sh"
   "scripts/kubeadm.sh"
+  "scripts/kubelet.sh"
 )
 
 for i in "${!install_scripts[@]}"; do
@@ -26,5 +28,5 @@ done
 
 kubeadm join $API_SERVER_ENDPOINT \
   --token $TOKEN \
-  --discovery-token-ca-cert-hash $DISCOVERY_TOKEN_HASH \
+  --discovery-token-ca-cert-hash $CA_CERT_HASH \
   --cri-socket=/run/containerd/containerd.sock

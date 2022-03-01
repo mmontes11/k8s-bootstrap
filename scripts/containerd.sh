@@ -3,13 +3,12 @@
 set -euo pipefail
 
 CONTAINERD_VERSION=1.4.12
+CONTAINERD_TARBALL=cri-containerd-cni-${CONTAINERD_VERSION}-linux-amd64.tar.gz
 
-apt update
-apt install libseccomp2
+wget https://github.com/containerd/containerd/releases/download/v${CONTAINERD_VERSION}/$CONTAINERD_TARBALL
 
-wget https://github.com/containerd/containerd/releases/download/v${CONTAINERD_VERSION}/cri-containerd-cni-${CONTAINERD_VERSION}-linux-amd64.tar.gz
-
-sudo tar --no-overwrite-dir -C / -xzf cri-containerd-cni-${CONTAINERD_VERSION}-linux-amd64.tar.gz
+tar --no-overwrite-dir -C / -xzf $CONTAINERD_TARBALL
+rm $CONTAINERD_TARBALL
 
 mkdir -p /etc/containerd
 cp config/containerd.toml /etc/containerd/config.toml
