@@ -1,0 +1,12 @@
+# kubectl
+alias k="kubectl"
+alias kaf="k apply -f"
+alias kgp="k get pods"
+alias kgpw="kgp --watch"
+alias kgs="k get svc"
+
+export do="--dry-run=client -o yaml"
+export now="--grace-period=0 --force"
+
+source <(kubectl completion bash)
+complete -F __start_kubectl k

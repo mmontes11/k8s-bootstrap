@@ -15,4 +15,5 @@ mkdir -p /etc/containerd
 cp config/containerd.toml /etc/containerd/config.toml
 
 systemctl daemon-reload
-systemctl restart containerd
+systemctl enable containerd
+systemctl start containerd
