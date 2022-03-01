@@ -12,7 +12,7 @@ wget https://github.com/containerd/containerd/releases/download/v${CONTAINERD_VE
 sudo tar --no-overwrite-dir -C / -xzf cri-containerd-cni-${CONTAINERD_VERSION}-linux-amd64.tar.gz
 
 mkdir -p /etc/containerd
-cp config/containerd/config.toml /etc/containerd/config.toml
+cp config/containerd.toml /etc/containerd/config.toml
 
 systemctl daemon-reload
 systemctl restart containerd

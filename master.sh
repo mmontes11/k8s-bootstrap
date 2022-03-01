@@ -14,7 +14,7 @@ for i in "${!install_scripts[@]}"; do
   source "${install_scripts[$i]}"
 done
 
-kubeadm init --config=config/kubeadm/init-config.yaml
+kubeadm init --config=config/kubeadm.yaml
 
 USER=$(get_user)
 USER_HOME=$(get_user_home)
