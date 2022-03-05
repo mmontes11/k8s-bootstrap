@@ -2,17 +2,17 @@
 
 set -euo pipefail
 
-CONTAINERD_VERSION=1.4.12
-CONTAINERD_TARBALL=cri-containerd-cni-${CONTAINERD_VERSION}-linux-amd64.tar.gz
+CONTAINERD_VERSION=1.4.13-1 
 
-wget https://github.com/containerd/containerd/releases/download/v${CONTAINERD_VERSION}/$CONTAINERD_TARBALL
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-tar --no-overwrite-dir -C / -xzf $CONTAINERD_TARBALL
-rm $CONTAINERD_TARBALL
+apt update
+apt install containerd.io=$CONTAINERD_VERSION
 
 mkdir -p /etc/containerd
 cp config/containerd.toml /etc/containerd/config.toml
 
-systemctl daemon-reload
-systemctl enable containerd
-systemctl start containerd
+systemctl restart containerd

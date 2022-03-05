@@ -24,7 +24,6 @@ if [ -z $ARCH ]; then
   exit 1
 fi
 
-
 # kubeconfig
 setup_kubeconfig root /root
 setup_kubeconfig $(get_user) $(get_user_home)

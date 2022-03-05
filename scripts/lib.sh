@@ -18,6 +18,8 @@ function get_architecture() {
     echo "amd64"
   elif [ $ARCH == "aarch64" ]; then
     echo "arm64"
+  elif [[ $ARCH == arm* ]]; then
+    echo "arm"
   else
     echo ""
   fi

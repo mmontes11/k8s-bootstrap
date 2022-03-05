@@ -9,9 +9,11 @@ pkgs=(
   fzf
   gawk
   git
+  gnupg
   htop
   jq
   libseccomp2
+  lsb-release
   net-tools
   openssh-server
   openssl
