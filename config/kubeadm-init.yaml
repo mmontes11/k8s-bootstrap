@@ -4,11 +4,14 @@ localAPIEndpoint:
   bindPort: 6443
 nodeRegistration:
   criSocket: /run/containerd/containerd.sock
-  taints: []
-  # taints:
-  #   - key: "node-role.kubernetes.io/master"
-  #     value: ""
-  #     effect: "NoSchedule"
+  kubeletExtraArgs:
+    container-runtime: remote
+    runtime-request-timeout: 15m
+    container-runtime-endpoint: unix:///run/containerd/containerd.sock
+  taints:
+    - key: "node.cilium.io/agent-not-ready"
+      value: "true"
+      effect: "NoSchedule"
 ---
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration

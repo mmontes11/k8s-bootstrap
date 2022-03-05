@@ -6,6 +6,7 @@ pkgs=(
   apt-transport-https
   ca-certificates
   curl
+  fzf
   gawk
   git
   htop

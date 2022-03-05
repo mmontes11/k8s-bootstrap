@@ -8,14 +8,12 @@ Setup the controlplane on the master node by running:
 sudo bash master.sh
 ```
 
-Using the output of the previous command, set this variables on the worker node:
+Copy the generated configuration `config/kubeadm-join.yaml` to each worker node and run this command to join the cluster:
 ```bash
-export API_SERVER_ENDPOINT=<API_SERVER_ENDPOINT>
-export TOKEN=<TOKEN>
-export DISCOVERY_TOKEN_HASH=<DISCOVERY_TOKEN_HASH>
+sudo bash worker.sh 
 ``` 
 
-Join the cluster and setup the worker node:
+Run this on the controlplane node for bootstrapping the core infrastructure:
 ```bash
-sudo --preserve-env bash worker.sh
+./bootstrap.sh
 ``` 
