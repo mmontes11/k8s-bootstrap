@@ -24,8 +24,9 @@ curl -L \
 CRICTL_VERSION="v1.22.0"
 curl -L "https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-${ARCH}.tar.gz" | \
   tar -C ${BIN_DIR} -xz
+cp config/crictl.yaml /etc/crictl.yaml
 
-# kubeadm
+# kubeadm, kubelet, kubectl
 cd $BIN_DIR
 curl -L --remote-name-all https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/${ARCH}/{kubeadm,kubelet,kubectl}
 chmod +x {kubeadm,kubelet,kubectl}
