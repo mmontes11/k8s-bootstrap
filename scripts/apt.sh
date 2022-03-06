@@ -5,6 +5,7 @@ apt update
 pkgs=(
   apt-transport-https
   ca-certificates
+  conntrack
   curl
   fzf
   gawk
@@ -18,6 +19,7 @@ pkgs=(
   openssh-server
   openssl
   sed
+  socat
   systemd
   vim
   wget
