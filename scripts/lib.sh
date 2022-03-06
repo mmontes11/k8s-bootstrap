@@ -58,5 +58,5 @@ function install_tar() {
 
   chmod +x $BIN_PATH
   mv $BIN_PATH /usr/local/bin/$BIN
-  rm -rf $BIN_PATH $BIN
+  rm -rf $TMP_TAR $TMP_BIN
 }
