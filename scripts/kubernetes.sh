@@ -4,6 +4,12 @@ set -euo pipefail
 
 source ./scripts/lib.sh
 
+ARCH=$(get_architecture)
+if [ -z $ARCH ]; then
+  echo "Architecture not supported"
+  exit 1
+fi
+
 function setup_kubeconfig() {
   USER=$1
   USER_HOME=$2
@@ -17,12 +23,6 @@ function setup_kubeconfig() {
   source $USER_HOME/.kubectl
   cat $USER_HOME/.kubectl >> $USER_HOME/.bashrc
 }
-
-ARCH=$(get_architecture)
-if [ -z $ARCH ]; then
-  echo "Architecture not supported: '$ARCH'"
-  exit 1
-fi
 
 # kubeconfig
 setup_kubeconfig root /root

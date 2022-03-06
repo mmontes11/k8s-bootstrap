@@ -6,7 +6,7 @@ source ./scripts/lib.sh
 
 ARCH=$(get_architecture)
 if [ -z $ARCH ]; then
-  echo "Architecture not supported: '$ARCH'"
+  echo "Architecture not supported"
   exit 1
 fi
 

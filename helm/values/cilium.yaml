@@ -106,13 +106,13 @@ affinity:
                 - linux
   podAntiAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-            - key: k8s-app
-              operator: In
-              values:
-                - cilium
-        topologyKey: kubernetes.io/hostname
+    - labelSelector:
+        matchExpressions:
+        - key: k8s-app
+          operator: In
+          values:
+          - cilium
+      topologyKey: kubernetes.io/hostname
 
 # -- The priority class to use for cilium-agent.
 priorityClassName: ""
@@ -127,8 +127,7 @@ extraEnv: {}
 extraInitContainers: []
 
 # -- Additional agent hostPath mounts.
-extraHostPathMounts:
-  []
+extraHostPathMounts: []
   # - name: host-mnt-data
   #   mountPath: /host/mnt/data
   #   hostPath: /mnt/data
@@ -137,8 +136,7 @@ extraHostPathMounts:
   #   mountPropagation: HostToContainer
 
 # -- Additional agent ConfigMap mounts.
-extraConfigmapMounts:
-  []
+extraConfigmapMounts: []
   # - name: certs-configmap
   #   mountPath: /certs
   #   configMap: certs-configmap
@@ -156,11 +154,11 @@ extraConfig: {}
 # -- Node tolerations for agent scheduling to nodes with taints
 # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
 tolerations:
-  - operator: Exists
-    # - key: "key"
-    #   operator: "Equal|Exists"
-    #   value: "value"
-    #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
+- operator: Exists
+  # - key: "key"
+  #   operator: "Equal|Exists"
+  #   value: "value"
+  #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
 
 # -- Annotations to be added to agent pods
 podAnnotations: {}
@@ -176,8 +174,7 @@ podDisruptionBudget:
 
 # -- Agent resource limits & requests
 # ref: https://kubernetes.io/docs/user-guide/compute-resources/
-resources:
-  {}
+resources: {}
   # limits:
   #   cpu: 4000m
   #   memory: 4Gi
@@ -186,8 +183,7 @@ resources:
   #   memory: 512Mi
 
 # -- Security context to be added to agent pods
-securityContext:
-  {}
+securityContext: {}
   # runAsUser: 0
 
 # -- Cilium agent update strategy
@@ -651,7 +647,7 @@ hubble:
       # Defaults to midnight of the first day of every fourth month. For syntax, see
       # https://kubernetes.io/docs/tasks/job/automated-tasks-with-cron-jobs/#schedule
       schedule: "0 0 1 */4 *"
-
+      
       # [Example]
       # certManagerIssuerRef:
       #   group: cert-manager.io
@@ -686,9 +682,8 @@ hubble:
     # -- Hubble-relay container image.
     image:
       repository: quay.io/cilium/hubble-relay
-      tag:
-        v1.11.2
-        # hubble-relay-digest
+      tag: v1.11.2
+       # hubble-relay-digest
       digest: "sha256:f031f95f3c9ba8962094649c0cc913f90723d553203444c8fb9a591e38873c9d"
       useDigest: true
       pullPolicy: IfNotPresent
@@ -771,7 +766,7 @@ hubble:
 
   ui:
     # -- Whether to enable the Hubble UI.
-    enabled: true
+    enabled: false
 
     standalone:
       # -- When true, it will allow installing the Hubble UI only, without checking dependencies.
@@ -783,8 +778,7 @@ hubble:
       tls:
         # -- When deploying Hubble UI in standalone, with tls enabled for Hubble relay, it is required
         # to provide a volume for mounting the client certificates.
-        certsVolume:
-          {}
+        certsVolume: {}
           # projected:
           #   defaultMode: 0400
           #   sources:
@@ -895,8 +889,7 @@ hubble:
     # -- hubble-ui ingress configuration.
     ingress:
       enabled: false
-      annotations:
-        {}
+      annotations: {}
         # kubernetes.io/ingress.class: nginx
         # kubernetes.io/tls-acme: "true"
       hosts:
@@ -905,6 +898,7 @@ hubble:
       #  - secretName: chart-example-tls
       #    hosts:
       #      - chart-example.local
+
 
 # -- Method to use for identity allocation (`crd` or `kvstore`).
 identityAllocationMode: "crd"
@@ -917,6 +911,7 @@ identityAllocationMode: "crd"
 
 # TODO: Add documentation
 # identityHeartbeatTimeout: ""
+
 
 # -- Configure whether to install iptables rules to allow for TPROXY
 # (L7 proxy injection), iptables-based masquerading and compatibility
@@ -943,9 +938,8 @@ ipam:
     clusterPoolIPv4MaskSize: 24
     # -- Deprecated in favor of ipam.operator.clusterPoolIPv6PodCIDRList.
     # IPv6 CIDR range to delegate to individual nodes for IPAM.
-    clusterPoolIPv6PodCIDR:
-      "fd00::/104"
-      # -- IPv6 CIDR list range to delegate to individual nodes for IPAM.
+    clusterPoolIPv6PodCIDR: "fd00::/104"
+     # -- IPv6 CIDR list range to delegate to individual nodes for IPAM.
     clusterPoolIPv6PodCIDRList: []
     # -- IPv6 CIDR mask size to delegate to individual nodes for IPAM.
     clusterPoolIPv6MaskSize: 120
@@ -974,8 +968,7 @@ ipvlan:
   # masterDevice: eth0
 
 # -- Configure Kubernetes specific configuration
-k8s:
-  {}
+k8s: {}
   # -- requireIPv4PodCIDR enables waiting for Kubernetes to provide the PodCIDR
   # range via the Kubernetes node resource
   # requireIPv4PodCIDR: false
@@ -1040,9 +1033,9 @@ localRedirectPolicy: false
 # -- Enables periodic logging of system load
 logSystemLoad: false
 
+
 # -- Configure maglev consistent hashing
-maglev:
-  {}
+maglev: {}
   # -- tableSize is the size (parameter M) for the backend table of one
   # service entry
   # tableSize:
@@ -1076,29 +1069,29 @@ monitor:
 
 # -- Configure service load balancing
 # loadBalancer:
-# -- standalone enables the standalone L4LB which does not connect to
-# kube-apiserver.
-# standalone: false
+  # -- standalone enables the standalone L4LB which does not connect to
+  # kube-apiserver.
+  # standalone: false
 
-# -- algorithm is the name of the load balancing algorithm for backend
-# selection e.g. random or maglev
-# algorithm: random
+  # -- algorithm is the name of the load balancing algorithm for backend
+  # selection e.g. random or maglev
+  # algorithm: random
 
-# -- mode is the operation mode of load balancing for remote backends
-# e.g. snat, dsr, hybrid
-# mode: snat
+  # -- mode is the operation mode of load balancing for remote backends
+  # e.g. snat, dsr, hybrid
+  # mode: snat
 
-# -- acceleration is the option to accelerate service handling via XDP
-# e.g. native, disabled
-# acceleration: disabled
+  # -- acceleration is the option to accelerate service handling via XDP
+  # e.g. native, disabled
+  # acceleration: disabled
 
-# -- dsrDispatch configures whether IP option or IPIP encapsulation is
-# used to pass a service IP and port to remote backend
-# dsrDispatch: opt
+  # -- dsrDispatch configures whether IP option or IPIP encapsulation is
+  # used to pass a service IP and port to remote backend
+  # dsrDispatch: opt
 
-# -- serviceTopology enables K8s Topology Aware Hints -based service
-# endpoints filtering
-# serviceTopology: false
+  # -- serviceTopology enables K8s Topology Aware Hints -based service
+  # endpoints filtering
+  # serviceTopology: false
 
 # -- Configure N-S k8s service loadbalancing
 nodePort:
@@ -1213,6 +1206,7 @@ wellKnownIdentities:
   # -- Enable the use of well-known identities.
   enabled: false
 
+
 etcd:
   # -- Enable etcd mode for the agent.
   enabled: false
@@ -1233,8 +1227,7 @@ etcd:
   extraInitContainers: []
 
   # -- Additional cilium-etcd-operator hostPath mounts.
-  extraHostPathMounts:
-    []
+  extraHostPathMounts: []
     # - name: textfile-dir
     #   mountPath: /srv/txt_collector
     #   hostPath: /var/lib/cilium-etcd-operator
@@ -1242,8 +1235,7 @@ etcd:
     #   mountPropagation: HostToContainer
 
   # -- Additional cilium-etcd-operator ConfigMap mounts.
-  extraConfigmapMounts:
-    []
+  extraConfigmapMounts: []
     # - name: certs-configmap
     #   mountPath: /certs
     #   configMap: certs-configmap
@@ -1252,11 +1244,11 @@ etcd:
   # -- Node tolerations for cilium-etcd-operator scheduling to nodes with taints
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   tolerations:
-    - operator: Exists
-      # - key: "key"
-      #   operator: "Equal|Exists"
-      #   value: "value"
-      #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
+  - operator: Exists
+    # - key: "key"
+    #   operator: "Equal|Exists"
+    #   value: "value"
+    #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
 
   # -- Node labels for cilium-etcd-operator pod assignment
   # ref: https://kubernetes.io/docs/user-guide/node-selection/
@@ -1276,8 +1268,7 @@ etcd:
 
   # -- cilium-etcd-operator resource limits & requests
   # ref: https://kubernetes.io/docs/user-guide/compute-resources/
-  resources:
-    {}
+  resources: {}
     # limits:
     #   cpu: 4000m
     #   memory: 4Gi
@@ -1286,8 +1277,7 @@ etcd:
     #   memory: 512Mi
 
   # -- Security context to be added to cilium-etcd-operator pods
-  securityContext:
-    {}
+  securityContext: {}
     # runAsUser: 0
 
   # -- cilium-etcd-operator update strategy
@@ -1356,13 +1346,14 @@ operator:
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchExpressions:
-              - key: io.cilium/app
-                operator: In
-                values:
-                  - operator
-          topologyKey: kubernetes.io/hostname
+      - labelSelector:
+          matchExpressions:
+          - key: io.cilium/app
+            operator: In
+            values:
+            - operator
+        topologyKey: kubernetes.io/hostname
+
 
   # -- Additional cilium-operator container arguments.
   extraArgs: []
@@ -1374,8 +1365,7 @@ operator:
   extraInitContainers: []
 
   # -- Additional cilium-operator hostPath mounts.
-  extraHostPathMounts:
-    []
+  extraHostPathMounts: []
     # - name: host-mnt-data
     #   mountPath: /host/mnt/data
     #   hostPath: /mnt/data
@@ -1384,8 +1374,7 @@ operator:
     #   mountPropagation: HostToContainer
 
   # -- Additional cilium-operator ConfigMap mounts.
-  extraConfigmapMounts:
-    []
+  extraConfigmapMounts: []
     # - name: certs-configmap
     #   mountPath: /certs
     #   configMap: certs-configmap
@@ -1394,11 +1383,11 @@ operator:
   # -- Node tolerations for cilium-operator scheduling to nodes with taints
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   tolerations:
-    - operator: Exists
-      # - key: "key"
-      #   operator: "Equal|Exists"
-      #   value: "value"
-      #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
+  - operator: Exists
+    # - key: "key"
+    #   operator: "Equal|Exists"
+    #   value: "value"
+    #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
 
   # -- Node labels for cilium-operator pod assignment
   # ref: https://kubernetes.io/docs/user-guide/node-selection/
@@ -1418,8 +1407,7 @@ operator:
 
   # -- cilium-operator resource limits & requests
   # ref: https://kubernetes.io/docs/user-guide/compute-resources/
-  resources:
-    {}
+  resources: {}
     # limits:
     #   cpu: 1000m
     #   memory: 1Gi
@@ -1428,8 +1416,7 @@ operator:
     #   memory: 128Mi
 
   # -- Security context to be added to cilium-operator pods
-  securityContext:
-    {}
+  securityContext: {}
     # runAsUser: 0
 
   # -- Interval for endpoint garbage collection.
@@ -1458,6 +1445,7 @@ operator:
   # -- Skip CRDs creation for cilium-operator
   skipCRDCreation: false
 
+
 nodeinit:
   # -- Enable the node initialization DaemonSet
   enabled: false
@@ -1482,8 +1470,7 @@ nodeinit:
   extraInitContainers: []
 
   # -- Additional nodeinit host path mounts.
-  extraHostPathMounts:
-    []
+  extraHostPathMounts: []
     # - name: textfile-dir
     #   mountPath: /srv/txt_collector
     #   hostPath: /var/lib/nodeinit
@@ -1491,8 +1478,7 @@ nodeinit:
     #   mountPropagation: HostToContainer
 
   # -- Additional nodeinit ConfigMap mounts.
-  extraConfigmapMounts:
-    []
+  extraConfigmapMounts: []
     # - name: certs-configmap
     #   mountPath: /certs
     #   configMap: certs-configmap
@@ -1501,11 +1487,11 @@ nodeinit:
   # -- Node tolerations for nodeinit scheduling to nodes with taints
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   tolerations:
-    - operator: Exists
-      # - key: "key"
-      #   operator: "Equal|Exists"
-      #   value: "value"
-      #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
+  - operator: Exists
+    # - key: "key"
+    #   operator: "Equal|Exists"
+    #   value: "value"
+    #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
 
   # -- Node labels for nodeinit pod assignment
   # ref: https://kubernetes.io/docs/user-guide/node-selection/
@@ -1531,8 +1517,7 @@ nodeinit:
       memory: 100Mi
 
   # -- Security context to be added to nodeinit pods.
-  securityContext:
-    {}
+  securityContext: {}
     # runAsUser: 0
 
   # -- bootstrapFile is the location of the file where the bootstrap timestamp is
@@ -1566,8 +1551,7 @@ preflight:
   extraInitContainers: []
 
   # -- Additional preflight host path mounts.
-  extraHostPathMounts:
-    []
+  extraHostPathMounts: []
     # - name: textfile-dir
     #   mountPath: /srv/txt_collector
     #   hostPath: /var/lib/preflight
@@ -1575,8 +1559,7 @@ preflight:
     #   mountPropagation: HostToContainer
 
   # -- Additional preflight ConfigMap mounts.
-  extraConfigmapMounts:
-    []
+  extraConfigmapMounts: []
     # - name: certs-configmap
     #   mountPath: /certs
     #   configMap: certs-configmap
@@ -1585,19 +1568,19 @@ preflight:
   # -- Node tolerations for preflight scheduling to nodes with taints
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   tolerations:
-    - effect: NoSchedule
-      key: node.kubernetes.io/not-ready
-    - effect: NoSchedule
-      key: node-role.kubernetes.io/master
-    - effect: NoSchedule
-      key: node.cloudprovider.kubernetes.io/uninitialized
-      value: "true"
-    - key: CriticalAddonsOnly
-      operator: "Exists"
-      # - key: "key"
-      #   operator: "Equal|Exists"
-      #   value: "value"
-      #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
+  - effect: NoSchedule
+    key: node.kubernetes.io/not-ready
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/master
+  - effect: NoSchedule
+    key: node.cloudprovider.kubernetes.io/uninitialized
+    value: "true"
+  - key: CriticalAddonsOnly
+    operator: "Exists"
+    # - key: "key"
+    #   operator: "Equal|Exists"
+    #   value: "value"
+    #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
 
   # -- Node labels for preflight pod assignment
   # ref: https://kubernetes.io/docs/user-guide/node-selection/
@@ -1617,8 +1600,7 @@ preflight:
 
   # -- preflight resource limits & requests
   # ref: https://kubernetes.io/docs/user-guide/compute-resources/
-  resources:
-    {}
+  resources: {}
     # limits:
     #   cpu: 4000m
     #   memory: 4Gi
@@ -1627,8 +1609,7 @@ preflight:
     #   memory: 512Mi
 
   # -- Security context to be added to preflight pods
-  securityContext:
-    {}
+  securityContext: {}
     # runAsUser: 0
 
   # -- Path to write the `--tofqdns-pre-cache` file to.
@@ -1751,7 +1732,7 @@ clustermesh:
         # fourth month. For syntax, see
         # https://kubernetes.io/docs/tasks/job/automated-tasks-with-cron-jobs/#schedule
         # schedule: "0 0 1 */4 *"
-
+        
         # [Example]
         # certManagerIssuerRef:
         #   group: cert-manager.io
@@ -1814,3 +1795,4 @@ cgroup:
 # -- Configure whether to enable auto detect of terminating state for endpoints
 # in order to support graceful termination.
 enableK8sTerminatingEndpoint: true
+

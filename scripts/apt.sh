@@ -7,7 +7,6 @@ pkgs=(
   ca-certificates
   conntrack
   curl
-  fzf
   gawk
   git
   gnupg

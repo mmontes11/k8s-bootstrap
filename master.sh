@@ -14,7 +14,7 @@ for i in "${!install_scripts[@]}"; do
 done
 
 kubeadm config images pull --config=config/kubeadm-init.yaml
-kubeadm init --config=config/kubeadm-init.yaml
+kubeadm init --config=config/kubeadm-init.yaml --ignore-preflight-errors=Mem
 
 post_install_scripts=(
   "scripts/kubernetes.sh"
