@@ -1,2 +1,48 @@
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+
+# Coverage
+cover.out
+cover.html
+
+# Dependency directories
+vendor/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+ehthumbs.db
+Icon?
+Thumbs.db
+Desktop.ini
+Thumbs.db
+.Trashes
+
+# data
+data/
+
+# secret examples
+*secret.yml
+
+# Chart dependencies
+charts/**/charts/*.tgz
+
+# misc
 *.tar.gz*
 /config/kubeadm-join.yaml
