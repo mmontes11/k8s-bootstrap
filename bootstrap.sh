@@ -6,6 +6,7 @@ helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server
 helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard
 helm repo add prometheus https://prometheus-community.github.io/helm-charts
 helm repo add metallb https://metallb.github.io/metallb
+helm repo add traefik https://helm.traefik.io/traefik
 helm repo update
 
 kubectl apply -f manifests/rbac
@@ -13,6 +14,9 @@ kubectl apply -f manifests/secrets
 
 # cni
 helm upgrade --install weave-net ./helm/charts/weave-net -n kube-system
+
+# local path provisioner
+helm upgrade --install local-path-provisioner ./helm/charts/local-path-provisioner -n kube-system
 
 # metrics-server
 METRICS_SERVER_VERSION=3.8.2
@@ -39,3 +43,11 @@ METALLB_VERSION=0.12.1
 helm upgrade --install metallb metallb/metallb \
   --version $METALLB_VERSION -f helm/values/metallb.yaml \
   -n kube-system
+
+# traefik
+TRAEFIK_VERSION=10.15.0
+helm upgrade --install traefik traefik/traefik \
+  --version $TRAEFIK_VERSION -f helm/values/traefik.yaml \
+  -n kube-system
+
+kubectl apply -f manifests/ingressroute
