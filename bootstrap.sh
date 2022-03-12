@@ -2,29 +2,40 @@
 
 set -euo pipefail
 
+helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server
+helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard
 helm repo add prometheus https://prometheus-community.github.io/helm-charts
 helm repo add metallb https://metallb.github.io/metallb
 helm repo update
 
+kubectl apply -f manifests/rbac
 kubectl apply -f manifests/secrets
 
 # cni
 helm upgrade --install weave-net ./helm/charts/weave-net -n kube-system
 
+# metrics-server
+METRICS_SERVER_VERSION=3.8.2
+helm upgrade --install metrics-server metrics-server/metrics-server \
+  --version=$METRICS_SERVER_VERSION -n kube-system
+
+# kubernetes-dashboard
+KUBERNETES_DASHBOARD_VERSION=5.3.0
+helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard \
+  --version=$KUBERNETES_DASHBOARD_VERSION -n monitoring --create-namespace 
+
 # kube-prometheus-stack
 KUBE_PROMETHEUS_STACK_VERSION=33.2.0
-
 helm upgrade --install kube-prometheus-stack prometheus/kube-prometheus-stack \
   --version $KUBE_PROMETHEUS_STACK_VERSION -f helm/values/kube-prometheus-stack.yaml \
   -n monitoring --create-namespace
 
 # metallb
-METALLB_VERSION=0.12.1 
-
 kubectl get configmap kube-proxy -n kube-system -o yaml | \
 sed -e "s/strictARP: false/strictARP: true/" | \
 kubectl apply -f - -n kube-system
 
+METALLB_VERSION=0.12.1 
 helm upgrade --install metallb metallb/metallb \
   --version $METALLB_VERSION -f helm/values/metallb.yaml \
   -n kube-system
