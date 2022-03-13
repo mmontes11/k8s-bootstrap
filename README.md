@@ -1,5 +1,5 @@
 # 🚀 k8s-infrastructure
-Kubernetes bootstrapping and core infrastructure for my personal Raspberry Pi cluster.
+Provisioning and core infrastructure for bare metal Kubernetes clusters
 
 ### Installation
 
