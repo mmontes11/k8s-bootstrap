@@ -6,6 +6,7 @@ metadata:
 spec:
   basicAuth:
     secret: traefik
+    removeHeader: true
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
