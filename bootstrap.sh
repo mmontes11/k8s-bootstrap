@@ -2,6 +2,7 @@
 
 set -euo pipefail
 
+helm repo add nfs-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server
 helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard
 helm repo add prometheus https://prometheus-community.github.io/helm-charts
@@ -17,6 +18,12 @@ helm upgrade --install weave-net ./helm/charts/weave-net -n kube-system
 
 # local path provisioner
 helm upgrade --install local-path-provisioner ./helm/charts/local-path-provisioner -n kube-system
+
+# nfs provisioner
+NFS_PROVISIONER_VERSION=4.0.16
+helm upgrade --install nfs-provisioner nfs-provisioner/nfs-subdir-external-provisioner \
+  --version=$NFS_PROVISIONER_VERSION -f helm/values/nfs-provisioner.yaml \
+  -n kube-system 
 
 # metrics-server
 METRICS_SERVER_VERSION=3.8.2
