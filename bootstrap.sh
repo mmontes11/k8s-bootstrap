@@ -26,7 +26,8 @@ helm upgrade --install metrics-server metrics-server/metrics-server \
 # kubernetes-dashboard
 KUBERNETES_DASHBOARD_VERSION=5.3.0
 helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard \
-  --version=$KUBERNETES_DASHBOARD_VERSION -n monitoring --create-namespace 
+  --version=$KUBERNETES_DASHBOARD_VERSION -f helm/values/kubernetes-dashboard.yaml\
+  -n monitoring --create-namespace 
 
 # kube-prometheus-stack
 KUBE_PROMETHEUS_STACK_VERSION=33.2.0
@@ -50,4 +51,4 @@ helm upgrade --install traefik traefik/traefik \
   --version $TRAEFIK_VERSION -f helm/values/traefik.yaml \
   -n kube-system
 
-kubectl apply -f manifests/ingressroute
+kubectl apply -f manifests/ingressroutes
