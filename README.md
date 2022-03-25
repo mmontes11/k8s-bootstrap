@@ -1,5 +1,5 @@
-# 🚀 k8s-infrastructure
-Provisioning and core infrastructure for bare metal Kubernetes clusters
+# 🚀 k8s-bootstrap
+Kubernetes cluster provision with [kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/) and infrastructure bootstrapping using [Flux](https://fluxcd.io/docs/)
 
 ### Installation
 
@@ -13,7 +13,7 @@ Copy the generated configuration `config/kubeadm-join.yaml` to each worker node 
 sudo bash worker.sh 
 ``` 
 
-Run this on the controlplane node for bootstrapping the core infrastructure:
+Run this on the controlplane node for bootstrapping the infrastructure:
 ```bash
 ./bootstrap.sh
 ``` 
