@@ -42,6 +42,10 @@ helm upgrade --install weave-net ./helm/charts/weave-net -n kube-system
 # local path provisioner
 helm upgrade --install local-path-provisioner ./helm/charts/local-path-provisioner -n kube-system
 
+# sealed secrets key
+kubectl create secret tls -n kube-system sealed-secrets-key --cert=certs/tls.crt --key=certs/tls.key 
+kubectl label secret -n kube-system sealed-secrets-key sealedsecrets.bitnami.com/sealed-secrets-key=active
+
 flux bootstrap github \
   --owner=$GITHUB_USER \
   --repository=k8s-infrastructure \
