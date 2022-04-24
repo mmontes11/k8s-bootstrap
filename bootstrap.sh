@@ -2,10 +2,12 @@
 
 set -euo pipefail
 
-# cni
+# cilium
 CILIUM_VERSION=1.11.4 
 helm repo add cilium https://helm.cilium.io/
 helm install cilium cilium/cilium --version $CILIUM_VERSION -n kube-system
+
+cilium status --wait
 
 # local path provisioner
 helm upgrade --install local-path-provisioner ./helm/charts/local-path-provisioner -n kube-system

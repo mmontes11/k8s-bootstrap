@@ -33,9 +33,12 @@ HELM_VERSION=v3.8.0
 HELM_URL=https://get.helm.sh/helm-$HELM_VERSION-linux-$ARCH.tar.gz
 install_tar helm $HELM_URL linux-$ARCH
 
-# cilium-cli
+# cilium
 CILIUM_VERSION=v0.11.1
 CILIUM_URL=https://github.com/cilium/cilium-cli/releases/download/$CILIUM_VERSION/cilium-linux-$ARCH.tar.gz
 install_tar cilium $CILIUM_URL ""
 
-# TODO: install flux-cli
+# flux
+FLUX_VERSION=0.27.4
+FLUX_URL="https://github.com/fluxcd/flux2/releases/download/v${FLUX_VERSION}/flux_${FLUX_VERSION}_linux_${ARCH}.tar.gz"
+install_tar flux $FLUX_URL ""
