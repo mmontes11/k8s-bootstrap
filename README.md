@@ -1,6 +1,13 @@
 # 🚀 k8s-bootstrap
 Kubernetes cluster provision with [kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/) and infrastructure bootstrapping using [Flux](https://fluxcd.io/docs/)
 
+### Prerequisites
+
+Make sure that the following cgroups are configured in both master and worker nodes:
+```text
+cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 cgroup_enable=hugetlb
+``` 
+
 ### Installation
 
 Setup the controlplane on the master node by running:
