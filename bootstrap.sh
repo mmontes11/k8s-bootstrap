@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# certificate signing requests
+k get csr -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | xargs kubectl certificate approve
+
 # cilium
 CILIUM_VERSION=1.11.4 
 helm repo add cilium https://helm.cilium.io/
