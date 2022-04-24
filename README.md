@@ -1,5 +1,5 @@
 # 🚀 k8s-bootstrap
-Kubernetes cluster provision with [kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/) and infrastructure bootstrapping using [Flux](https://fluxcd.io/docs/)
+Kubernetes cluster bootstrapping using [kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/), [cilium](https://cilium.io/) and [flux](https://fluxcd.io).
 
 ### Prerequisites
 
