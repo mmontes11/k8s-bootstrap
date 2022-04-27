@@ -15,6 +15,7 @@ pkgs=(
   libseccomp2
   lsb-release
   net-tools
+  nfs-common
   openssh-server
   openssl
   sed
