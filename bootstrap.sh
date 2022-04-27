@@ -24,6 +24,6 @@ flux bootstrap github \
   --owner=$GITHUB_USER \
   --repository=k8s-infrastructure \
   --branch=main \
-  --path=./clusters/mmontes-dev \
+  --path=./clusters/production \
   --personal \
   --private=false
