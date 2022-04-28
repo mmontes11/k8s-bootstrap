@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+# node labels
+kubectl label node k8s-master node.mmontes.io/type=compute
+kubectl label node k8s-worker0 node.mmontes.io/type=compute
+
 # cilium
 CILIUM_VERSION=1.11.4 
 helm repo add cilium https://helm.cilium.io/
