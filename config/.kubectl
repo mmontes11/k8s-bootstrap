@@ -10,8 +10,5 @@ alias kdf="k delete --force --grace-period 0"
 alias kyaml="k --dry-run=client -o yaml"
 alias netshoot="kubectl run netshoot --rm -i --tty --image nicolaka/netshoot -- /bin/bash"
 
-export do="--dry-run=client -o yaml"
-export now="--grace-period=0 --force"
-
 source <(kubectl completion bash)
 complete -F __start_kubectl k
