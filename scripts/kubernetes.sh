@@ -20,8 +20,8 @@ function setup_kubeconfig() {
   chown $(id -u $USER):$(id -g $USER) $USER_HOME/.kube
 
   cp config/.kubectl $USER_HOME/.kubectl
-  source $USER_HOME/.kubectl
-  cat $USER_HOME/.kubectl >> $USER_HOME/.bashrc
+  echo "source ~/.kubectl" >> $USER_HOME/.bashrc
+  echo "source <(kubectl completion bash)" >> $USER_HOME/.bashrc
 }
 
 # kubeconfig
