@@ -13,7 +13,6 @@ nodeRegistration:
     runtime-request-timeout: 15m
     container-runtime-endpoint: unix:///run/containerd/containerd.sock
   taints:
-    []
-    # - key: "node.cilium.io/agent-not-ready"
-    #   value: "true"
-    #   effect: "NoSchedule"
+    - key: "node.cilium.io/agent-not-ready"
+      value: "true"
+      effect: "NoSchedule"
