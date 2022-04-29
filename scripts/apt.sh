@@ -11,6 +11,7 @@ pkgs=(
   git
   gnupg
   htop
+  ipvsadm 
   jq
   libseccomp2
   lsb-release
