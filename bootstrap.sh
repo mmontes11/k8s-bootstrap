@@ -6,6 +6,11 @@ set -euo pipefail
 kubectl label node k8s-master node.mmontes.io/type=compute
 kubectl label node k8s-worker0 node.mmontes.io/type=compute
 
+# certificate signing requests
+kubectl get csr \
+  -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' \
+  | xargs kubectl certificate approve
+
 # cilium
 CILIUM_VERSION=1.11.4 
 helm repo add cilium https://helm.cilium.io/
