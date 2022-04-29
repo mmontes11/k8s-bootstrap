@@ -3,8 +3,8 @@
 set -euo pipefail
 
 # node labels
-kubectl label node k8s-master node.mmontes.io/type=compute
-kubectl label node k8s-worker0 node.mmontes.io/type=compute
+kubectl label node k8s-master node.mmontes.io/type=compute --overwrite 
+kubectl label node k8s-worker0 node.mmontes.io/type=compute --overwrite 
 
 # certificate signing requests
 kubectl get csr \
@@ -25,8 +25,15 @@ kubectl rollout restart deployment/coredns -n kube-system
 helm upgrade --install local-path-provisioner ./helm/charts/local-path-provisioner -n kube-system
 
 # sealed secrets
-kubectl create secret tls -n kube-system sealed-secrets-key --cert=certs/tls.crt --key=certs/tls.key 
-kubectl label secret -n kube-system sealed-secrets-key sealedsecrets.bitnami.com/sealed-secrets-key=active
+kubectl create secret tls \
+  -n kube-system sealed-secrets-key \
+  --cert=certs/tls.crt --key=certs/tls.key \
+  --dry-run=client -o yaml \
+  | kubectl apply -f -
+kubectl label secret \
+  -n kube-system sealed-secrets-key\
+   sealedsecrets.bitnami.com/sealed-secrets-key=active \
+  --overwrite 
 
 # flux 
 flux bootstrap github \
