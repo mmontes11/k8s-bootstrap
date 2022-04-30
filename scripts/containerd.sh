@@ -10,7 +10,7 @@ echo \
   $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 apt update
-apt install containerd.io=$CONTAINERD_VERSION
+apt install -y containerd.io=$CONTAINERD_VERSION
 
 mkdir -p /etc/containerd
 cp config/containerd.toml /etc/containerd/config.toml
