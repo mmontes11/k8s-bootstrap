@@ -4,6 +4,12 @@ set -euo pipefail
 
 KUBERNETES_VERSION=1.22.9-00 
 
+# crictl
+cp config/crictl.yaml /etc/crictl.yaml
+
+# kubelet
+mkdir -p /etc/kubernetes/manifests
+
 curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
 
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" \
