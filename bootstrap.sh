@@ -2,9 +2,8 @@
 
 set -euo pipefail
 
-# node labels
-kubectl label node k8s-master node.mmontes.io/type=compute --overwrite 
-kubectl label node k8s-worker0 node.mmontes.io/type=compute --overwrite 
+# nodes
+source ./scripts/nodes.sh
 
 # certificate signing requests
 kubectl get csr \
@@ -14,7 +13,9 @@ kubectl get csr \
 # cilium
 CILIUM_VERSION=1.11.4 
 helm repo add cilium https://helm.cilium.io/
-helm upgrade --install cilium cilium/cilium --version $CILIUM_VERSION -n kube-system
+helm upgrade --install \
+  cilium cilium/cilium --version $CILIUM_VERSION \
+  -n kube-system
 cilium status --wait
 
 # coredns

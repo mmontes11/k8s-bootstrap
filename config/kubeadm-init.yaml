@@ -29,6 +29,7 @@ imageRepository: k8s.gcr.io
 kubernetesVersion: v1.22.9
 networking:
   serviceSubnet: "10.96.0.0/16"
+  # TODO: sync with scripts/nodes.sh
   podSubnet: "10.244.0.0/24"
   dnsDomain: "cluster.local"
 ---
