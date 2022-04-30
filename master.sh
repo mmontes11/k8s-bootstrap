@@ -25,4 +25,4 @@ for i in "${!post_install_scripts[@]}"; do
   source "${post_install_scripts[$i]}"
 done
 
-echo "Installation completed successfully! 🚀"
+echo "master installation completed successfully! 🚀"

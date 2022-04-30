@@ -23,3 +23,5 @@ for i in "${!install_scripts[@]}"; do
 done
 
 kubeadm join --config $JOIN_CONFIG_FILE
+
+echo "worker installation completed successfully! 🚜"

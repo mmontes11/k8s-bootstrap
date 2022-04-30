@@ -31,7 +31,7 @@ kubectl create secret tls \
   --dry-run=client -o yaml \
   | kubectl apply -f -
 kubectl label secret \
-  -n kube-system sealed-secrets-key\
+  -n kube-system sealed-secrets-key \
    sealedsecrets.bitnami.com/sealed-secrets-key=active \
   --overwrite 
 
