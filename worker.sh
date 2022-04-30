@@ -15,7 +15,7 @@ install_scripts=(
   "scripts/apt.sh"
   "scripts/network.sh"
   "scripts/containerd.sh"
-  "scripts/kubeadm.sh"
+  "scripts/kubernetes.sh"
 )
 
 for i in "${!install_scripts[@]}"; do

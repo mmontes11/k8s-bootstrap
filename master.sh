@@ -6,7 +6,7 @@ install_scripts=(
   "scripts/apt.sh"
   "scripts/network.sh"
   "scripts/containerd.sh"
-  "scripts/kubeadm.sh"
+  "scripts/kubernetes.sh"
 )
 
 for i in "${!install_scripts[@]}"; do
@@ -17,7 +17,7 @@ kubeadm config images pull --config=config/kubeadm-init.yaml
 kubeadm init --config=config/kubeadm-init.yaml --ignore-preflight-errors=Mem
 
 post_install_scripts=(
-  "scripts/kubernetes.sh"
+  "scripts/cli.sh"
   "scripts/join-config.sh"
 )
 

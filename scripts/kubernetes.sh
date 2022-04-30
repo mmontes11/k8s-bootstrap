@@ -10,35 +10,38 @@ if [ -z $ARCH ]; then
   exit 1
 fi
 
-function setup_kubeconfig() {
-  USER=$1
-  USER_HOME=$2
+KUBERNETES_VERSION=v1.22.7
+BIN_DIR=/usr/local/bin 
 
-  mkdir -p $USER_HOME/.kube
-  cp /etc/kubernetes/admin.conf $USER_HOME/.kube/config
-  chown $(id -u $USER):$(id -g $USER) $USER_HOME/.kube/config
-  chown $(id -u $USER):$(id -g $USER) $USER_HOME/.kube
+# cni
+CNI_VERSION="v0.8.2"
+mkdir -p /opt/cni/bin
+curl -L \
+  "https://github.com/containernetworking/plugins/releases/download/${CNI_VERSION}/cni-plugins-linux-${ARCH}-${CNI_VERSION}.tgz" | \
+  tar -C /opt/cni/bin -xz
 
-  cp config/.kubectl $USER_HOME/.kubectl
-  echo "source ~/.kubectl" >> $USER_HOME/.bashrc
-  echo "source <(kubectl completion bash)" >> $USER_HOME/.bashrc
-}
+# crictl
+CRICTL_VERSION="v1.22.0"
+curl -L "https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-${ARCH}.tar.gz" | \
+  tar -C ${BIN_DIR} -xz
+cp config/crictl.yaml /etc/crictl.yaml
 
-# kubeconfig
-setup_kubeconfig root /root
-setup_kubeconfig $(get_user) $(get_user_home)
+# kubeadm, kubelet, kubectl
+cd $BIN_DIR
+curl -L --remote-name-all https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/${ARCH}/{kubeadm,kubelet,kubectl}
+chmod +x {kubeadm,kubelet,kubectl}
+cd -
 
-# # helm
-HELM_VERSION=v3.8.0
-HELM_URL=https://get.helm.sh/helm-$HELM_VERSION-linux-$ARCH.tar.gz
-install_tar helm $HELM_URL linux-$ARCH
+RELEASE_VERSION="v0.4.0"
+curl -sSL \
+  "https://raw.githubusercontent.com/kubernetes/release/${RELEASE_VERSION}/cmd/kubepkg/templates/latest/deb/kubelet/lib/systemd/system/kubelet.service" | \
+  sed "s:/usr/bin:${BIN_DIR}:g" | \
+  tee /etc/systemd/system/kubelet.service
 
-# cilium
-CILIUM_VERSION=v0.11.1
-CILIUM_URL=https://github.com/cilium/cilium-cli/releases/download/$CILIUM_VERSION/cilium-linux-$ARCH.tar.gz
-install_tar cilium $CILIUM_URL ""
+mkdir -p /etc/systemd/system/kubelet.service.d
+curl -sSL \
+  "https://raw.githubusercontent.com/kubernetes/release/${RELEASE_VERSION}/cmd/kubepkg/templates/latest/deb/kubeadm/10-kubeadm.conf" | \
+  sed "s:/usr/bin:${BIN_DIR}:g" | \
+  tee /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
 
-# flux
-FLUX_VERSION=0.27.4
-FLUX_URL="https://github.com/fluxcd/flux2/releases/download/v${FLUX_VERSION}/flux_${FLUX_VERSION}_linux_${ARCH}.tar.gz"
-install_tar flux $FLUX_URL ""
+systemctl enable --now kubelet
