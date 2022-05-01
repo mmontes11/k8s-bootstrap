@@ -18,10 +18,6 @@ helm upgrade --install \
   -n kube-system
 cilium status --wait
 
-# coredns
-kubectl apply -f manifests/configmaps/coredns.yaml
-kubectl rollout restart deployment/coredns -n kube-system
-
 # local path provisioner
 helm upgrade --install local-path-provisioner ./helm/charts/local-path-provisioner -n kube-system
 
