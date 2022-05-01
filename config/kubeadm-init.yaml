@@ -18,15 +18,22 @@ nodeRegistration:
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
-apiServer:
-  timeoutForControlPlane: 4m0s
+imageRepository: k8s.gcr.io
+# TODO: sync with scripts/kubernetes.sh
+kubernetesVersion: v1.22.9
 certificatesDir: /etc/kubernetes/pki
 clusterName: kubernetes
 etcd:
   local:
+    extraArgs:
+      listen-metrics-urls: "http://0.0.0.0:2381"
     dataDir: /var/lib/etcd
-imageRepository: k8s.gcr.io
-kubernetesVersion: v1.22.9
+controllerManager:
+  extraArgs:
+    bind-address: 0.0.0.0
+scheduler:
+  extraArgs:
+    bind-address: 0.0.0.0
 networking:
   serviceSubnet: "10.96.0.0/16"
   # TODO: sync with scripts/nodes.sh
@@ -38,6 +45,7 @@ kind: KubeProxyConfiguration
 mode: "ipvs"
 ipvs:
   strictARP: true
+metricsBindAddress: 0.0.0.0:10249
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
