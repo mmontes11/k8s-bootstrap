@@ -15,6 +15,7 @@ CILIUM_VERSION=1.11.4
 helm repo add cilium https://helm.cilium.io/
 helm upgrade --install \
   cilium cilium/cilium --version $CILIUM_VERSION \
+  -f helm/values/cilium.yaml \
   -n kube-system
 cilium status --wait
 
