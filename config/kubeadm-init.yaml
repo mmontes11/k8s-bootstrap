@@ -34,6 +34,9 @@ controllerManager:
 scheduler:
   extraArgs:
     bind-address: 0.0.0.0
+apiServer:
+  certSANs:
+    - mmontes-dev.duckdns.org
 networking:
   serviceSubnet: "10.96.0.0/16"
   # TODO: sync with scripts/nodes.sh
