@@ -28,7 +28,7 @@ function setup_kubeconfig() {
 setup_kubeconfig root /root
 setup_kubeconfig $(get_user) $(get_user_home)
 
-# # helm
+# helm
 HELM_VERSION=v3.8.0
 HELM_URL=https://get.helm.sh/helm-$HELM_VERSION-linux-$ARCH.tar.gz
 install_tar helm $HELM_URL linux-$ARCH

@@ -17,12 +17,3 @@ net.bridge.bridge-nf-call-ip6tables = 1
 EOF
 
 sysctl --system
-
-# custom hosts
-cat <<EOT >> /etc/hosts
-192.168.0.100 k8s-master
-192.168.0.101 k8s-worker0
-192.168.0.102 k8s-worker1
-192.168.0.103 k8s-worker2
-192.168.0.120 nas
-EOT
