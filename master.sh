@@ -18,6 +18,7 @@ kubeadm init --config=config/kubeadm-init.yaml --ignore-preflight-errors=Mem
 
 post_install_scripts=(
   "scripts/cli.sh"
+  "scripts/tailscale.sh"
   "scripts/join-config.sh"
 )
 
