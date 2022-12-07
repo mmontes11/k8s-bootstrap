@@ -12,16 +12,17 @@ if [ -z "$GITHUB_REPO" ]; then
   exit 1
 fi
 
-nodes
-source ./scripts/nodes.sh
-
-certificate signing requests
+#certificate signing requests
 kubectl get csr \
   -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' \
   | xargs kubectl certificate approve
 
+# prometheus crds (required by cilium)
+kubectl apply -f \
+  https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
+
 # cilium
-CILIUM_VERSION=1.11.4 
+CILIUM_VERSION=1.12.4
 helm repo add cilium https://helm.cilium.io/
 helm upgrade --install \
   cilium cilium/cilium --version $CILIUM_VERSION \
@@ -30,7 +31,10 @@ helm upgrade --install \
 cilium status --wait
 
 # local path provisioner
-helm upgrade --install local-path-provisioner ./helm/charts/local-path-provisioner -n kube-system
+helm upgrade --install \
+  local-path-provisioner \
+  ./helm/charts/local-path-provisioner \
+  -n kube-system
 
 # sealed secrets
 SECRETS_NAMESPACE=secrets
