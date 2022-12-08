@@ -30,12 +30,12 @@ setup_kubeconfig $(get_user) $(get_user_home)
 
 # helm
 HELM_VERSION=v3.8.0
-HELM_URL=https://get.helm.sh/helm-$HELM_VERSION-linux-$ARCH.tar.gz
+HELM_URL="https://get.helm.sh/helm-$HELM_VERSION-linux-$ARCH.tar.gz"
 install_tar helm $HELM_URL linux-$ARCH
 
 # cilium
 CILIUM_VERSION=v0.11.1
-CILIUM_URL=https://github.com/cilium/cilium-cli/releases/download/$CILIUM_VERSION/cilium-linux-$ARCH.tar.gz
+CILIUM_URL="https://github.com/cilium/cilium-cli/releases/download/$CILIUM_VERSION/cilium-linux-$ARCH.tar.gz"
 install_tar cilium $CILIUM_URL ""
 
 # flux
