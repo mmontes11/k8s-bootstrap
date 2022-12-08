@@ -11,6 +11,7 @@ echo \
 
 apt update
 apt install -y containerd.io=$CONTAINERD_VERSION
+apt-mark hold containerd.io
 
 mkdir -p /etc/containerd
 cp config/containerd.toml /etc/containerd/config.toml
