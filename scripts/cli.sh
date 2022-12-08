@@ -29,16 +29,16 @@ setup_kubeconfig root /root
 setup_kubeconfig $(get_user) $(get_user_home)
 
 # helm
-HELM_VERSION=v3.8.0
+HELM_VERSION=v3.10.2
 HELM_URL="https://get.helm.sh/helm-$HELM_VERSION-linux-$ARCH.tar.gz"
 install_tar helm $HELM_URL linux-$ARCH
 
 # cilium
-CILIUM_VERSION=v0.11.1
+CILIUM_VERSION=v0.12.11
 CILIUM_URL="https://github.com/cilium/cilium-cli/releases/download/$CILIUM_VERSION/cilium-linux-$ARCH.tar.gz"
 install_tar cilium $CILIUM_URL ""
 
 # flux
-FLUX_VERSION=0.27.4
+FLUX_VERSION=v0.37.0
 FLUX_URL="https://github.com/fluxcd/flux2/releases/download/v${FLUX_VERSION}/flux_${FLUX_VERSION}_linux_${ARCH}.tar.gz"
 install_tar flux $FLUX_URL ""
