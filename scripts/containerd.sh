@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-CONTAINERD_VERSION=1.5.11-1 
+CONTAINERD_VERSION= 1.6.12-1
 
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo \
