@@ -44,7 +44,7 @@ EOF
 sysctl --system
 
 # local hosts
-cat <<EOT | tee /etc/hosts
+cat <<EOT >> /etc/hosts
 192.168.0.110 k8s-master.local
 192.168.0.111 k8s-worker0.local
 192.168.0.112 k8s-worker1.local
