@@ -1,3 +1,8 @@
 write-kubeconfig-mode: "0644"
 tls-san:
   - "mmontes.duckdns.org"
+node-taint: "node-role.kubernetes.io/control-plane:NoSchedule"
+disable-helm-controller: true
+disable:
+  - traefik
+  - servicelb
