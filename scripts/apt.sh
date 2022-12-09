@@ -5,7 +5,7 @@ apt upgrade
 
 apt install \
   apt-transport-https \
-  ca-certificate \
+  ca-certificates \
   conntrack \
   curl \
   gawk \
