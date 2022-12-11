@@ -5,7 +5,7 @@ Kubernetes cluster bootstrapping using [kubeadm](https://kubernetes.io/docs/setu
 
 Make sure that the following cgroups are configured in both master and worker nodes (`/boot/firmware/cmdline.txt`):
 ```text
-cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 cgroup_enable=hugetlb
+cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 cgroup_enable=hugetlb cgroup_enable=blkio
 ``` 
 
 ### Installation
