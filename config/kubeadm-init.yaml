@@ -10,7 +10,7 @@ nodeRegistration:
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
 # TODO: sync with scripts/kubernetes.sh
-kubernetesVersion: v1.25.4
+kubernetesVersion: v1.26.0
 etcd:
   local:
     extraArgs:
