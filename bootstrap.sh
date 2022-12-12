@@ -34,6 +34,7 @@ helm upgrade --install \
 helm upgrade --install \
   local-path-provisioner \
   ./charts/local-path-provisioner \
+  -f config/local-path-provisioner.yaml \
   -n kube-system
 
 # sealed secrets
