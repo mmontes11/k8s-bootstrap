@@ -24,11 +24,11 @@ kubectl apply -f \
 # cilium
 CILIUM_VERSION=1.12.4
 helm repo add cilium https://helm.cilium.io/
+helm repo update
 helm upgrade --install \
   cilium cilium/cilium --version $CILIUM_VERSION \
   -f config/cilium.yaml \
   -n kube-system
-cilium status --wait
 
 # local path provisioner
 helm upgrade --install \

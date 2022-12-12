@@ -16,6 +16,7 @@ apt install \
   ipvsadm  \
   jq \
   libseccomp2 \
+  linux-headers-raspi \
   lsb-release \
   net-tools \
   nfs-common \

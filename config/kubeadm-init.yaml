@@ -26,6 +26,9 @@ apiServer:
   certSANs:
     - mmontes.duckdns.org
 networking:
+  serviceSubnet: "10.96.0.0/16"
+  # TODO: sync with config/cilium.yaml
+  podSubnet: "10.0.0.0/8"
   dnsDomain: "cluster.local"
 ---
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
