@@ -25,4 +25,12 @@ done
 
 kubeadm join --config $JOIN_CONFIG_FILE
 
+post_install_scripts=(
+  "scripts/tailscale.sh"
+)
+
+for i in "${!post_install_scripts[@]}"; do
+  source "${post_install_scripts[$i]}"
+done
+
 echo "worker installation completed successfully! 🚜"
