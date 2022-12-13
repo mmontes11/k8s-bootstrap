@@ -47,4 +47,4 @@ ipam:
   operator:
     # TODO: sync with config/kubeadm-init.yaml
     clusterPoolIPv4PodCIDRList:
-      - 10.0.0.0/8
+      - 10.10.0.0/16
