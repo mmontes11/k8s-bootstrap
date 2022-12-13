@@ -56,7 +56,7 @@ kubectl label secret \
 flux bootstrap github \
   --owner=$GITHUB_USER \
   --repository=$GITHUB_REPO \
-  --branch=kubernetes-1.25 \
+  --branch=main \
   --path=./clusters/production \
   --personal \
   --private=false
