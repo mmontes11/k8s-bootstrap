@@ -20,9 +20,10 @@ Copy the generated configuration `config/kubeadm-join.yaml` to each worker node 
 sudo bash worker.sh 
 ``` 
 
-Run this on the controlplane node for bootstrapping the [infrastructure](https://github.com/mmontes11/k8s-infrastructure):
+Reboot all nodes and run this on the controlplane for bootstrapping the [infrastructure](https://github.com/mmontes11/k8s-infrastructure):
 ```bash
 export GITHUB_USER=mmontes11
 export GITHUB_REPO=k8s-infrastructure 
+export GITHUB_TOKEN=<your-personal-access-token>
 ./bootstrap.sh
 ``` 

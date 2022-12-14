@@ -12,7 +12,7 @@ if [ -z "$GITHUB_REPO" ]; then
   exit 1
 fi
 
-#certificate signing requests
+# certificate signing requests
 kubectl get csr \
   -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' \
   | xargs kubectl certificate approve
