@@ -6,5 +6,5 @@ curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.tailscale-keyring.list
 apt update
 apt install -y tailscale
 
-tailscale up --advertise-routes=192.168.0.0/16 --accept-dns=false
+tailscale up --advertise-routes=192.168.0.0/16 --reset
 tailscale status

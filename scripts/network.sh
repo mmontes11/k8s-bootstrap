@@ -8,6 +8,7 @@ source ./scripts/lib.sh
 # https://kubernetes.io/docs/setup/production-environment/container-runtimes/
 # https://github.com/kubernetes/kubernetes/blob/master/pkg/proxy/ipvs/README.md#prerequisite
 # https://kubernetes.io/docs/reference/networking/ports-and-protocols/
+# https://tailscale.com/kb/1019/subnets/?tab=linux#enable-ip-forwarding
 
 # kernel modules
 cat <<EOF | tee /etc/modules-load.d/k8s.conf
@@ -36,11 +37,14 @@ done
 
 lsmod | grep -e overlay -e br_netfilter -e ip_vs -e nf_conntrack
 
-# sysctl params required by setup, params persist across reboots
 cat <<EOF | tee /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-iptables  = 1
 net.bridge.bridge-nf-call-ip6tables = 1
 net.ipv4.ip_forward                 = 1
+EOF
+cat <<EOF | tee /etc/sysctl.d/tailscale.conf
+net.ipv4.ip_forward          = 1
+net.ipv6.conf.all.forwarding = 1
 EOF
 
 sysctl --system
@@ -61,11 +65,3 @@ for i in "${!ports[@]}"; do
   ufw allow "$PORT/tcp"
   ufw allow "$PORT/udp"
 done
-
-# local hosts
-cat <<EOT >> /etc/hosts
-192.168.0.100 k8s-master.local
-192.168.0.101 k8s-worker0.local
-192.168.0.102 k8s-worker1.local
-192.168.0.120 nas.local
-EOT
