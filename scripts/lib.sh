@@ -60,3 +60,14 @@ function install_tar() {
   mv $BIN_PATH /usr/local/bin/$BIN
   rm -rf $TMP_TAR $TMP_BIN
 }
+
+function add_host() {
+  IP=$1
+  HOSTNAME=$2
+  if [ -n "$(grep $HOSTNAME /etc/hosts)" ]; then
+    echo "\"$HOSTNAME\" host already exists in /etc/hosts"
+  else
+    echo "Adding \"$HOSTNAME\" to /etc/hosts";
+    sudo -- sh -c -e "echo '\n# k8s-bootstrap\n$IP\t$HOSTNAME' >> /etc/hosts";
+  fi  
+}
