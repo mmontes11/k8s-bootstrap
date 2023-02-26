@@ -64,10 +64,11 @@ function install_tar() {
 function add_host() {
   IP=$1
   HOSTNAME=$2
-  if [ -n "$(grep $HOSTNAME /etc/hosts)" ]; then
-    echo "\"$HOSTNAME\" host already exists in /etc/hosts"
+  HOSTS_FILE=$3
+  if [ -n "$(grep $HOSTNAME $HOSTS_FILE)" ]; then
+    echo "\"$HOSTNAME\" host already exists in $HOSTS_FILE"
   else
-    echo "Adding \"$HOSTNAME\" to /etc/hosts";
-    sudo -- sh -c -e "echo '\n# k8s-bootstrap\n$IP\t$HOSTNAME' >> /etc/hosts";
+    echo "Adding \"$HOSTNAME\" to $HOSTS_FILE";
+    sudo -- sh -c -e "echo '\n# k8s-bootstrap\n$IP\t$HOSTNAME' >> $HOSTS_FILE";
   fi  
 }

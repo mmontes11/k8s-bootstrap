@@ -67,4 +67,4 @@ for i in "${!ports[@]}"; do
 done
 
 # hosts
-add_host 192.168.0.120 "nas.local" 
+add_host 192.168.0.120 "nas.local" "/etc/cloud/templates/hosts.debian.tmpl"
