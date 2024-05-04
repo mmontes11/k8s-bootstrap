@@ -4,13 +4,16 @@ set -euo pipefail
 
 source ./scripts/lib.sh
 
+# see:
+# https://kubernetes.io/docs/setup/production-environment/container-runtimes/
+
 ARCH=$(get_architecture)
 if [ -z $ARCH ]; then
   echo "Architecture not supported"
   exit 1
 fi
 
-CONTAINERD_VERSION=1.6.12-1
+CONTAINERD_VERSION=1.6.31-1
   
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo \
