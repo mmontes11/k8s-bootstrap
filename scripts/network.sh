@@ -65,6 +65,3 @@ for i in "${!ports[@]}"; do
   ufw allow "$PORT/tcp"
   ufw allow "$PORT/udp"
 done
-
-# hosts
-add_host 192.168.0.120 "nas.local" "/etc/cloud/templates/hosts.debian.tmpl"
