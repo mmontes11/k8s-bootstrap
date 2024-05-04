@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-apt update -y
+apt update
 apt upgrade -y
 
 apt install \
@@ -13,6 +13,7 @@ apt install \
   gawk \
   git \
   gnupg \
+  gpg \
   htop \
   ipset \
   ipvsadm  \
