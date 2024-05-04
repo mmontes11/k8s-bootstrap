@@ -42,6 +42,7 @@ data/
 
 # Chart dependencies
 charts/**/charts/*.tgz
+/local-path-provisioner/
 
 # misc
 *.tar.gz*
