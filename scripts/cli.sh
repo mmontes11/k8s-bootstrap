@@ -27,5 +27,5 @@ function setup_kubeconfig() {
 setup_kubeconfig root /root
 setup_kubeconfig $(get_user) $(get_user_home)
 
-K8S_SCRIPTS_VERSION=v0.0.19
-curl -sfL https://raw.githubusercontent.com/mmontes11/k8s-scripts/$K8S_SCRIPTS_VERSION/kubernetes.sh | bash -s -
+# K8S_SCRIPTS_VERSION=v0.0.19
+# curl -sfL https://raw.githubusercontent.com/mmontes11/k8s-scripts/$K8S_SCRIPTS_VERSION/kubernetes.sh | bash -s -

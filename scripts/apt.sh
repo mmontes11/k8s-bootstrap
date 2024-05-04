@@ -19,8 +19,7 @@ apt install \
   ipvsadm  \
   jq \
   libseccomp2 \
-  linux-headers-raspi \
-  linux-modules-extra-raspi \
+  linux-raspi \
   lsb-release \
   net-tools \
   nfs-common \
