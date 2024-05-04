@@ -28,4 +28,4 @@ for i in "${!post_install_scripts[@]}"; do
   source "${post_install_scripts[$i]}"
 done
 
-echo "master installation completed successfully! 🚀"
+echo "controlplane installation completed successfully! 🚀"

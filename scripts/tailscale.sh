@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # TODO: enable/disable based on tailscale-operator experience
 
 curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.noarmor.gpg | tee /usr/share/keyrings/tailscale-archive-keyring.gpg >/dev/null

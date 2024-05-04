@@ -3,16 +3,16 @@ Kubernetes cluster bootstrapping using [kubeadm](https://kubernetes.io/docs/setu
 
 ### Requirements
 
-Make sure that the following cgroups are configured in both master and worker nodes (`/boot/firmware/cmdline.txt`):
+Make sure that the following cgroups are configured in both controlplane and worker nodes (`/boot/firmware/cmdline.txt`):
 ```text
 cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 cgroup_enable=hugetlb cgroup_enable=blkio
 ``` 
 
 ### Installation
 
-Setup the controlplane on the master node by running:
+Setup the controlplane by running:
 ```bash
-sudo bash master.sh
+sudo bash controlplane.sh
 ```
 
 Copy the generated configuration `config/kubeadm-join.yaml` to each worker node and run this command to join the cluster:
