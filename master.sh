@@ -5,8 +5,8 @@ set -euo pipefail
 install_scripts=(
   "scripts/apt.sh"
   "scripts/swap.sh"
-  "scripts/containerd.sh"
   "scripts/network.sh"
+  "scripts/containerd.sh"
   "scripts/kubernetes.sh"
 )
 
@@ -19,7 +19,8 @@ kubeadm init --config=config/kubeadm-init.yaml
 
 post_install_scripts=(
   "scripts/cli.sh"
-  "scripts/tailscale.sh"
+  # TODO: enable/disable based on tailscale-operator experience
+  # "scripts/tailscale.sh"
   "scripts/join-config.sh"
 )
 
