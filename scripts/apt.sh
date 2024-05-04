@@ -1,7 +1,9 @@
 #!/bin/bash
 
-apt update
-apt upgrade
+set -euo pipefail
+
+apt update -y
+apt upgrade -y
 
 apt install \
   apt-transport-https \
