@@ -6,6 +6,8 @@ source ./scripts/lib.sh
 
 # see:
 # https://kubernetes.io/docs/setup/production-environment/container-runtimes/
+# https://kubernetes.io/docs/setup/production-environment/container-runtimes/#containerd
+# https://docs.docker.com/engine/install/ubuntu/
 
 ARCH=$(get_architecture)
 if [ -z $ARCH ]; then
@@ -14,11 +16,15 @@ if [ -z $ARCH ]; then
 fi
 
 CONTAINERD_VERSION=1.6.31-1
-  
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+chmod a+r /etc/apt/keyrings/docker.asc
+
 echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" \
+  | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 apt update
 apt install -y containerd.io=$CONTAINERD_VERSION
