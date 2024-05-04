@@ -1,12 +1,19 @@
 # 🚀 k8s-bootstrap
 Kubernetes cluster bootstrapping using [kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/).
 
-### Requirements
+### System compatibility
 
-Make sure that the following cgroups are configured in both controlplane and worker nodes (`/boot/firmware/cmdline.txt`):
-```text
-cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 cgroup_enable=hugetlb cgroup_enable=blkio
-``` 
+This Kubernetes installation has been verified on Ubuntu 24.04 running on both Raspberry Pi 4 and 5.
+
+### Node preparation
+
+Execute the provided script on all nodes (both control plane and worker nodes) prior to starting the installation process:
+
+```bash
+sudo bash scripts/prepare-node.sh
+```
+
+Once completed, reboot the node and proceed with the [installation](#installation).
 
 ### Installation
 
