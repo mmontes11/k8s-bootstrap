@@ -72,3 +72,10 @@ function add_host() {
     sudo -- sh -c -e "echo '\n# k8s-bootstrap\n$IP\t$HOSTNAME' >> $HOSTS_FILE";
   fi  
 }
+
+check_variable() {
+  if [ -z "${!1}" ]; then
+    echo "Environment variable \"$1\" not set"
+    exit 1
+  fi
+}

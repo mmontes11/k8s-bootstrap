@@ -2,15 +2,13 @@
 
 set -euo pipefail
 
-if [ -z "$GITHUB_USER" ]; then
-  echo "Environment variable \"GITHUB_USER\" not set"
-  exit 1
-fi
+source ./scripts/lib.sh
 
-if [ -z "$GITHUB_REPO" ]; then
-  echo "Environment variable \"GITHUB_REPO\" not set"
-  exit 1
-fi
+check_variable "GITHUB_USER"
+check_variable "GITHUB_REPO"
+check_variable "GITHUB_BRANCH"
+check_variable "GITHUB_PATH"
+check_variable "GITHUB_TOKEN"
 
 # certificate signing requests
 kubectl get csr \
@@ -56,7 +54,7 @@ kubectl label secret \
 flux bootstrap github \
   --owner=$GITHUB_USER \
   --repository=$GITHUB_REPO \
-  --branch=main \
-  --path=./clusters/production \
+  --branch=$GITHUB_BRANCH \
+  --path=$GITHUB_PATH \
   --personal \
   --private=false

@@ -24,6 +24,8 @@ Reboot all nodes and run this on the controlplane for bootstrapping the [infrast
 ```bash
 export GITHUB_USER=mmontes11
 export GITHUB_REPO=k8s-infrastructure 
+export GITHUB_BRANCH=main
+export GITHUB_PATH=clusters/homelab
 export GITHUB_TOKEN=<your-personal-access-token>
 ./bootstrap.sh
 ``` 
