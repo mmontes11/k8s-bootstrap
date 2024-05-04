@@ -5,7 +5,6 @@ set -euo pipefail
 source ./scripts/lib.sh
 
 # see:
-# https://kubernetes.io/docs/setup/production-environment/container-runtimes/
 # https://github.com/kubernetes/kubernetes/blob/master/pkg/proxy/ipvs/README.md#prerequisite
 # https://kubernetes.io/docs/reference/networking/ports-and-protocols/
 # https://tailscale.com/kb/1019/subnets/?tab=linux#enable-ip-forwarding
