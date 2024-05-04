@@ -74,8 +74,9 @@ function add_host() {
 }
 
 check_variable() {
-  if [ -z "${!1}" ]; then
-    echo "Environment variable \"$1\" not set"
+  VAR=$1
+  if [ -z "$VAR" ]; then
+    echo "Environment variable \"$VAR\" not set"
     exit 1
   fi
 }

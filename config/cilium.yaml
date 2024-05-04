@@ -1,12 +1,10 @@
-k8sServiceHost: 192.168.0.100
+k8sServiceHost: 10.0.0.10
 k8sServicePort: 6443
 tolerations:
   - effect: NoSchedule
     key: node-role.kubernetes.io/control-plane
   - effect: NoSchedule
     key: node.kubernetes.io/not-ready
-containerRuntime:
-  integration: containerd
 hubble:
   enabled: true
   metrics:
@@ -20,8 +18,6 @@ hubble:
       - http
     serviceMonitor:
       enabled: true
-      labels:
-        release: kube-prometheus-stack
   relay:
     enabled: true
   ui:
@@ -30,8 +26,6 @@ prometheus:
   enabled: true
   serviceMonitor:
     enabled: true
-    labels:
-      release: kube-prometheus-stack
 operator:
   enabled: true
   tolerations:
@@ -41,10 +35,9 @@ operator:
     enabled: true
     serviceMonitor:
       enabled: true
-      labels:
-        release: kube-prometheus-stack
 ipam:
   operator:
     # TODO: sync with config/kubeadm-init.yaml
     clusterPoolIPv4PodCIDRList:
-      - 10.10.0.0/16
+      - 10.244.0.0/16
+    clusterPoolIPv4MaskSize: 24

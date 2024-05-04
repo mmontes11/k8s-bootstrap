@@ -16,11 +16,12 @@ kubectl get csr \
   | xargs kubectl certificate approve
 
 # prometheus crds (required by cilium)
+PROMETHEUS_VERSION="58.3.1"
 kubectl apply -f \
-  https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
+  https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-${PROMETHEUS_VERSION}/charts/kube-prometheus-stack/charts/crds/crds/crd-servicemonitors.yaml
 
 # cilium
-CILIUM_VERSION=1.12.4
+CILIUM_VERSION=1.15.4
 helm repo add cilium https://helm.cilium.io/
 helm repo update
 helm upgrade --install \
@@ -29,11 +30,13 @@ helm upgrade --install \
   -n kube-system
 
 # local path provisioner
+git clone https://github.com/rancher/local-path-provisioner.git
 helm upgrade --install \
   local-path-provisioner \
-  ./charts/local-path-provisioner \
+  ./local-path-provisioner/deploy/chart/local-path-provisioner \
   -f config/local-path-provisioner.yaml \
   -n kube-system
+rm -rf local-path-provisioner
 
 # sealed secrets
 SECRETS_NAMESPACE=secrets
