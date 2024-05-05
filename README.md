@@ -27,7 +27,7 @@ Copy the generated configuration `config/kubeadm-join.yaml` to each worker node 
 sudo bash worker.sh 
 ``` 
 
-Finally, run this on the controlplane for bootstrapping the [infrastructure](https://github.com/mmontes11/k8s-infrastructure):
+Run this on the controlplane for bootstrapping the [infrastructure](https://github.com/mmontes11/k8s-infrastructure):
 ```bash
 export GITHUB_USER=mmontes11
 export GITHUB_REPO=k8s-infrastructure 
@@ -36,3 +36,11 @@ export GITHUB_PATH=clusters/homelab
 export GITHUB_TOKEN=<your-personal-access-token>
 ./bootstrap.sh
 ``` 
+
+### Label nodes
+
+In order to label nodes, run the following script in the controlplane:
+
+```bash
+./label-nodes.sh
+```
