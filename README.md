@@ -44,3 +44,11 @@ In order to label nodes, run the following script in the controlplane:
 ```bash
 ./label-nodes.sh
 ```
+
+### Kubeconfig
+
+`admin` and `super-admin` kubeconfigs are available in the following controlplane paths:
+- `/etc/kubernetes/admin.conf`
+- `/etc/kubernetes/super-admin.conf`
+
+This [article](https://raesene.github.io/blog/2024/01/06/when-is-admin-not-admin/) depicts the differences between them.
