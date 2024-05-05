@@ -1,5 +1,5 @@
 # 🚀 k8s-bootstrap
-Kubernetes cluster bootstrapping using [kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/).
+Bootstrapping Kubernetes clusters on Raspberry Pi using [kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/).
 
 ### System compatibility
 
