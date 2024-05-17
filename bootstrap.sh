@@ -1,14 +1,15 @@
 #!/bin/bash
 
-set -euo pipefail
+set -eo pipefail
 
-source ./scripts/lib.sh
-
-check_variable "GITHUB_USER"
-check_variable "GITHUB_REPO"
-check_variable "GITHUB_BRANCH"
-check_variable "GITHUB_PATH"
-check_variable "GITHUB_TOKEN"
+GITHUB_USER=${GITHUB_USER:-mmontes11}
+GITHUB_REPO=${GITHUB_REPO:-k8s-infrastructure }
+GITHUB_BRANCH=${GITHUB_BRANCH:-v3} # TODO: update default branch to main
+GITHUB_PATH=${GITHUB_PATH:-clusters/homelab}
+if [ -z "$GITHUB_TOKEN" ]; then
+  echo "GITHUB_TOKEN environment variable must be provided"
+  exit 1
+fi
 
 # certificate signing requests
 kubectl get csr \
