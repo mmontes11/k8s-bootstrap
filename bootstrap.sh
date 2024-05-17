@@ -14,7 +14,7 @@ fi
 # certificate signing requests
 kubectl get csr \
   -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' \
-  | xargs kubectl certificate approve
+  | xargs -r kubectl certificate approve
 
 # prometheus crds (required by cilium)
 PROMETHEUS_VERSION="58.3.1"
@@ -41,7 +41,9 @@ rm -rf local-path-provisioner
 
 # sealed secrets
 SECRETS_NAMESPACE=secrets
-kubectl create namespace $SECRETS_NAMESPACE
+kubectl create namespace $SECRETS_NAMESPACE \
+  --dry-run=client -o yaml \
+  | kubectl apply -f -
 kubectl create secret tls \
   -n $SECRETS_NAMESPACE \
   sealed-secrets-key \
