@@ -1,6 +1,8 @@
 # 🚀 k8s-bootstrap
 Bootstrapping Kubernetes clusters on Raspberry Pi using [kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/).
 
+You may also take a look at the Talos installation: [k8s-bootstrap-talos](https://github.com/mmontes11/k8s-bootstrap-talos).
+
 ### System compatibility
 
 This Kubernetes installation has been verified on Ubuntu 24.04 running on both Raspberry Pi 4 and 5.
