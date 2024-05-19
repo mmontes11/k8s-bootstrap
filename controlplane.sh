@@ -19,8 +19,6 @@ kubeadm init --config=config/kubeadm-init.yaml
 
 post_install_scripts=(
   "scripts/cli.sh"
-  # TODO: enable/disable based on tailscale-operator experience
-  # "scripts/tailscale.sh"
   "scripts/join-config.sh"
 )
 

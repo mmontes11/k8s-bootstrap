@@ -7,8 +7,6 @@ source ./scripts/lib.sh
 # see:
 # https://github.com/kubernetes/kubernetes/blob/master/pkg/proxy/ipvs/README.md#prerequisite
 # https://kubernetes.io/docs/reference/networking/ports-and-protocols/
-# TODO: enable/disable based on tailscale-operator experience
-# https://tailscale.com/kb/1019/subnets/?tab=linux#enable-ip-forwarding
 
 # kernel modules
 cat <<EOF | tee /etc/modules-load.d/k8s.conf
@@ -43,13 +41,6 @@ net.bridge.bridge-nf-call-iptables  = 1
 net.bridge.bridge-nf-call-ip6tables = 1
 net.ipv4.ip_forward                 = 1
 EOF
-# TODO: enable/disable based on tailscale-operator experience
-# tailscale
-# cat <<EOF | tee /etc/sysctl.d/tailscale.conf
-# net.ipv4.ip_forward          = 1
-# net.ipv6.conf.all.forwarding = 1
-# EOF
-
 sysctl --system
 
 # firewall ports
