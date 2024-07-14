@@ -1,5 +1,5 @@
 # 🚀 k8s-bootstrap
-Bootstrapping Kubernetes clusters on Raspberry Pi using [kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/).
+Bootstrap Kubernetes clusters on Raspberry Pi using [kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/).
 
 You may also take a look at the Talos installation: [k8s-bootstrap-talos](https://github.com/mmontes11/k8s-bootstrap-talos).
 
