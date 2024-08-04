@@ -7,10 +7,19 @@ source ./scripts/lib.sh
 # see:
 # https://github.com/rook/rook/issues/1312
 
-cat <<EOF | tee /etc/modules-load.d/rbd.conf
+# kernel modules
+cat <<EOF | tee /etc/modules-load.d/rook-ceph.conf
 rbd
+ceph
 EOF
 
-modprobe -- "rbd"
+modules=(
+  rbd
+  ceph
+)
+
+for i in "${!modules[@]}"; do
+  modprobe -- "${modules[$i]}"
+done
 
 sysctl --system
