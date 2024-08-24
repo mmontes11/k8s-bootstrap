@@ -5,8 +5,8 @@ set -euo pipefail
 # see:
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl
 
-KUBERNETES_VERSION=v1.30
-KUBERNETES_PKG=1.30.0-1.1
+KUBERNETES_VERSION=v1.31
+KUBERNETES_PKG=1.31.0-1.1
 
 curl -fsSL https://pkgs.k8s.io/core:/stable:/${KUBERNETES_VERSION}/deb/Release.key \
   | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg

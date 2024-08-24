@@ -21,7 +21,7 @@ Once completed, reboot the node and proceed with the [installation](#installatio
 
 Setup the controlplane by running:
 ```bash
-sudo bash controlplane.sh
+sudo bash control-plane.sh
 ```
 
 Copy the generated configuration `config/kubeadm-join.yaml` to each worker node and run this command to join the cluster:
