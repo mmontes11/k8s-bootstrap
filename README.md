@@ -19,7 +19,7 @@ Once completed, reboot the node and proceed with the [installation](#installatio
 
 ### Installation
 
-Setup the controlplane by running:
+Setup the control-plane by running:
 ```bash
 sudo bash control-plane.sh
 ```
@@ -29,7 +29,7 @@ Copy the generated configuration `config/kubeadm-join.yaml` to each worker node 
 sudo bash worker.sh 
 ``` 
 
-Run this on the controlplane for bootstrapping the [infrastructure](https://github.com/mmontes11/k8s-infrastructure):
+Run this on the control-plane for bootstrapping the [infrastructure](https://github.com/mmontes11/k8s-infrastructure):
 ```bash
 export GITHUB_USER=mmontes11
 export GITHUB_REPO=k8s-infrastructure 
@@ -41,7 +41,7 @@ export GITHUB_TOKEN=<your-personal-access-token>
 
 ### Label nodes
 
-In order to label nodes, run the following script in the controlplane:
+In order to label nodes, run the following script in the control-plane:
 
 ```bash
 ./label-nodes.sh
@@ -49,7 +49,7 @@ In order to label nodes, run the following script in the controlplane:
 
 ### Kubeconfig
 
-`admin` and `super-admin` kubeconfigs are available in the following controlplane paths:
+`admin` and `super-admin` kubeconfigs are available in the following control-plane paths:
 - `/etc/kubernetes/admin.conf`
 - `/etc/kubernetes/super-admin.conf`
 
