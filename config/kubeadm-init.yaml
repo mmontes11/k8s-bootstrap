@@ -1,26 +1,34 @@
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: InitConfiguration
 nodeRegistration:
   criSocket: unix:///run/containerd/containerd.sock
   kubeletExtraArgs:
-    container-runtime-endpoint: unix:///run/containerd/containerd.sock
+  - name: container-runtime-endpoint
+    value: unix:///run/containerd/containerd.sock
 ---
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: ClusterConfiguration
 # TODO: sync with scripts/kubernetes.sh
-kubernetesVersion: v1.30.0
+kubernetesVersion: v1.31.0
 clusterName: homelab
+caCertificateValidityPeriod: 87600h0m0s # 10 years
+certificateValidityPeriod: 8760h0m0s # 1 year
+certificatesDir: /etc/kubernetes/pki
+encryptionAlgorithm: "ECDSA-P256"
 etcd:
   local:
-    extraArgs:
-      listen-metrics-urls: "http://0.0.0.0:2381"
     dataDir: /var/lib/etcd
+    extraArgs:
+    - name: listen-metrics-urls
+      value: http://0.0.0.0:2381
 controllerManager:
   extraArgs:
-    bind-address: 0.0.0.0
+  - name: bind-address
+    value: 0.0.0.0
 scheduler:
   extraArgs:
-    bind-address: 0.0.0.0
+  - name: bind-address
+    value: 0.0.0.0
 networking:
   # TODO: sync with config/cilium.yaml
   podSubnet: "10.244.0.0/16"

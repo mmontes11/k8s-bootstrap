@@ -27,4 +27,4 @@ function setup_kubeconfig() {
 setup_kubeconfig root /root
 setup_kubeconfig $(get_user) $(get_user_home)
 
-curl -sfL https://raw.githubusercontent.com/mmontes11/k8s-tooling/main/kubernetes.sh | sudo bash -s -
+sudo -u $(get_user) curl -sfL https://raw.githubusercontent.com/mmontes11/k8s-tooling/main/kubernetes.sh | sudo bash -s -
