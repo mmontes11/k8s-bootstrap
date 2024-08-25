@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "kubeadm-join-config-*"
+
+jobs:
+  args:
+    name: Arguments
+    runs-on: ubuntu-latest
+    outputs:
+      VERSION: ${{ steps.args.outputs.VERSION }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch tags
+        run: git fetch --force --tags
+
+      - name: Args
+        id: args
+        run: |
+          function get_version() {
+            echo "$1" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+'
+          }
+          TAG=${GITHUB_REF/refs\/tags\//}
+          VERSION=$(get_version "$TAG")
+
+          if [ -z "$VERSION" ]; then
+            echo "Invalid version. Exiting..."
+            exit 1
+          fi
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+
+  goreleaser:
+    name: Goreleaser
+    runs-on: ubuntu-latest
+    needs:
+      - args 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch tags
+        run: git fetch --force --tags
+
+      - name: GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          version: ${{ needs.args.outputs.VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
