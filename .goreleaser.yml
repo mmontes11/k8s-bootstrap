@@ -1,0 +1,13 @@
+changelog:
+  use: github-native
+builds:
+  - id: kubeadm-join-config
+    main: ./cmd/kubeadm-join-config
+    binary: "kubeadm-join-config_{{ .Version }}_{{ .Arch }}"
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64

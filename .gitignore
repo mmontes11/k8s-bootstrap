@@ -47,4 +47,5 @@ charts/**/charts/*.tgz
 # misc
 *.tar.gz*
 /config/kubeadm-join.yaml
+/config/kubeadm-join.*.yaml
 /certs

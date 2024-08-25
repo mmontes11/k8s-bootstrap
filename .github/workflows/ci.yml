@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request: {}
+
+env:
+  GOLANGCI_VERSION: "v1.60.1"
+
+jobs:
+  detect-noop:
+    name: Detect noop
+    runs-on: ubuntu-latest
+    outputs:
+      noop: ${{ steps.noop.outputs.should_skip }}
+    steps:
+      - name: Detect no-op changes
+        id: noop
+        uses: fkirc/skip-duplicate-actions@v5.3.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          paths_ignore: '["*.md"]'
+          concurrent_skipping: false
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    needs: detect-noop
+    if: ${{ needs.detect-noop.outputs.noop != 'true' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+
+      - name: GolangCI Lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: ${{ env.GOLANGCI_VERSION }}
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: detect-noop
+    if: ${{ needs.detect-noop.outputs.noop != 'true' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+
+      - name: Build
+        run: make build
+
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    needs: detect-noop
+    if: ${{ needs.detect-noop.outputs.noop != 'true' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+
+      - name: Test
+        run: make test
