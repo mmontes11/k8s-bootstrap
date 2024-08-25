@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "kubeadm-join-config-*"
+      - "v*"
 
 env:
   GORELEASER_VERSION: "v2.2.0"
@@ -21,13 +21,10 @@ jobs:
       - name: Fetch tags
         run: git fetch --force --tags
 
-      - name: Set GORELEASER_PREVIOUS_TAG
-        run: echo "GORELEASER_PREVIOUS_TAG=$(git tag -l "kubeadm-join-config-*" --sort=-version:refname | head -n 2 | tail -n 1)" >> $GITHUB_ENV
-
       - name: GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           version: ${{ env.GORELEASER_VERSION }}
-          args: release --skip=validate
+          args: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
