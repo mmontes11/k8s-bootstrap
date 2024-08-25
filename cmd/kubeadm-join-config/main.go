@@ -22,7 +22,7 @@ func main() {
 	flag.StringVar(&configPath, "config-path", "",
 		"Path where the join configuration will be written. For example: config/kubeadm-join.yaml."+
 			"If not provided, stdout if used.")
-	flag.StringVar(&apiServerEndpoint, "api-server-endoint", "",
+	flag.StringVar(&apiServerEndpoint, "api-server-endpoint", "",
 		"API server endpoint used to bootstrap the Node. For example: 10.0.0.20:6443.")
 	flag.StringVar(&token, "token", "", "Token used to bootstrap the Node.")
 	flag.StringVar(&caCertHash, "ca-cert-hash", "", "CA certificate hash used to bootstrap the Node.")
@@ -32,7 +32,7 @@ func main() {
 	flag.Parse()
 
 	if apiServerEndpoint == "" || token == "" || caCertHash == "" {
-		fmt.Println("api-server-endoint, token and ca-cert-hash flags are mandatory.")
+		fmt.Println("api-server-endpoint, token and ca-cert-hash flags are mandatory.")
 		os.Exit(1)
 	}
 
