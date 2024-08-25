@@ -21,7 +21,7 @@ var (
 func main() {
 	flag.StringVar(&configPath, "config-path", "",
 		"Path where the join configuration will be written. For example: config/kubeadm-join.yaml."+
-			"If not provided, stdout if used.")
+			"If not provided, stdout is used.")
 	flag.StringVar(&apiServerEndpoint, "api-server-endpoint", "",
 		"API server endpoint used to bootstrap the Node. For example: 10.0.0.20:6443.")
 	flag.StringVar(&token, "token", "", "Token used to bootstrap the Node.")
