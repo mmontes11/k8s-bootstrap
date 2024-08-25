@@ -32,7 +32,7 @@ func main() {
 	flag.Parse()
 
 	if apiServerEndpoint == "" || token == "" || caCertHash == "" {
-		fmt.Println("config-path, api-server-endoint, token and ca-cert-hash flags are mandatory.")
+		fmt.Println("api-server-endoint, token and ca-cert-hash flags are mandatory.")
 		os.Exit(1)
 	}
 
