@@ -12,3 +12,5 @@ builds:
     goarch:
       - amd64
       - arm64
+archives:
+  - format: binary
