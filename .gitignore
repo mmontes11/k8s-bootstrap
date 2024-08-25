@@ -49,3 +49,4 @@ charts/**/charts/*.tgz
 /config/kubeadm-join.yaml
 /config/kubeadm-join.*.yaml
 /certs
+dist/
