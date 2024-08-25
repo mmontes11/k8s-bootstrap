@@ -47,7 +47,7 @@ lint: golangci-lint ## Lint.
 
 .PHONY: release
 release: goreleaser ## Test release locally.
-	$(GORELEASER) release --snapshot --rm-dist
+	$(GORELEASER) release --snapshot --clean
 
 ##@ Run
 
@@ -79,5 +79,5 @@ $(GOLANGCI_LINT): $(LOCALBIN)
 .PHONY: goreleaser
 goreleaser: $(GORELEASER) ## Download goreleaser locally if necessary.
 $(GORELEASER): $(LOCALBIN)
-	GOBIN=$(LOCALBIN) $(GO) install github.com/goreleaser/goreleaser@$(GORELEASER_VERSION)
+	GOBIN=$(LOCALBIN) $(GO) install github.com/goreleaser/goreleaser/v2@$(GORELEASER_VERSION)
 
