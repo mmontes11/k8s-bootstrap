@@ -1,7 +1,3 @@
-tolerations:
-  - effect: NoSchedule
-    key: node-role.kubernetes.io/control-plane
-
 storageClass:
   create: true
   defaultClass: true

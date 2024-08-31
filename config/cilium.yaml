@@ -1,10 +1,12 @@
-k8sServiceHost: 10.0.0.10
+k8sServiceHost: 10.0.0.20
 k8sServicePort: 6443
 tolerations:
   - effect: NoSchedule
     key: node-role.kubernetes.io/control-plane
   - effect: NoSchedule
     key: node.kubernetes.io/not-ready
+  - effect: NoSchedule
+    key: node.mmontes.io/storage
 hubble:
   enabled: true
   metrics:
