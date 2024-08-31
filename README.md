@@ -16,7 +16,7 @@ This Kubernetes installation has been verified on Ubuntu 24.04 running on both R
 Execute the provided script on all nodes (both control plane and worker nodes) prior to starting the installation process:
 
 ```bash
-sudo bash prepare-node.sh
+sudo bash node-prepare.sh
 ```
 
 Once completed, reboot the node and proceed with the [installation](#installation).
