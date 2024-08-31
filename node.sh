@@ -4,14 +4,18 @@ set -euo pipefail
 
 source ./scripts/lib.sh
 
-JOIN_CONFIG_FILE=config/kubeadm-join.yaml
+if [ $# -lt 1 ]; then
+  echo "Usage: $0 <join-config-file>"
+  exit 1
+fi
 
+JOIN_CONFIG_FILE="$1"
 if [ ! -f $JOIN_CONFIG_FILE ]; then
   echo "Join configuration file '$JOIN_CONFIG_FILE' not found"
   exit 1
 fi
 
-install_scripts=(
+INSTALL_SCRIPTS=(
   "scripts/apt.sh"
   "scripts/swap.sh"
   "scripts/network.sh"
@@ -19,11 +23,10 @@ install_scripts=(
   "scripts/containerd.sh"
   "scripts/kubernetes.sh"
 )
-
-for i in "${!install_scripts[@]}"; do
-  source "${install_scripts[$i]}"
+for INSTALL in "${INSTALL_SCRIPTS[@]}"; do
+  source "$INSTALL"
 done
 
 kubeadm join --config $JOIN_CONFIG_FILE
 
-echo "worker installation completed successfully! 🚜"
+echo "node installation completed successfully! 🚜"

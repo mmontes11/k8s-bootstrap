@@ -28,9 +28,9 @@ Setup the control-plane by running:
 sudo bash control-plane.sh
 ```
 
-Copy the generated configuration `config/kubeadm-join.yaml` to each worker node and run this command to join the cluster:
+Copy the generated configuration files `config/kubeadm-join.<node-type>.yaml` to each node and run this command to join the cluster:
 ```bash
-sudo bash worker.sh 
+sudo bash node.sh 'config/kubeadm-join.<node-type>.yaml' 
 ``` 
 
 Run this on the control-plane for bootstrapping the [infrastructure](https://github.com/mmontes11/k8s-infrastructure):
@@ -42,14 +42,6 @@ export GITHUB_PATH=clusters/homelab
 export GITHUB_TOKEN=<your-personal-access-token>
 ./bootstrap.sh
 ``` 
-
-### Label nodes
-
-In order to label nodes, run the following script in the control-plane:
-
-```bash
-./label-nodes.sh
-```
 
 ### Kubeconfig
 
