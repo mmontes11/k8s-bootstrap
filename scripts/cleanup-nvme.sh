@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# see:
+# https://rook.io/docs/rook/latest-release/Getting-Started/ceph-teardown/
+# https://rook.io/docs/rook/latest-release/Getting-Started/Prerequisites/prerequisites/#cpu-architecture
+
 DISK="/dev/nvme0n1"
 
 # Zap the disk to a fresh, usable state (zap-all is important, b/c MBR has to be clean)
