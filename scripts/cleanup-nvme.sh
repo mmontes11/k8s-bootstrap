@@ -2,7 +2,7 @@
 
 # see:
 # https://rook.io/docs/rook/latest-release/Getting-Started/ceph-teardown/
-# https://rook.io/docs/rook/latest-release/Getting-Started/Prerequisites/prerequisites/#cpu-architecture
+# https://rook.io/docs/rook/latest-release/Getting-Started/Prerequisites/prerequisites/#ceph-prerequisites
 
 DISK="/dev/nvme0n1"
 
