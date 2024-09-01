@@ -13,3 +13,6 @@ blkdiscard $DISK
 
 # Inform the OS of partition table changes
 partprobe $DISK
+
+# Remove rook directory
+rm -rf /var/lib/rook
