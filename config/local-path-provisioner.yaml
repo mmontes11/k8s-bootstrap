@@ -1,6 +1,6 @@
 storageClass:
   create: true
-  defaultClass: true
+  defaultClass: false
   defaultVolumeType: hostPath
   name: local-path
   reclaimPolicy: Delete

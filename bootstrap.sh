@@ -31,7 +31,7 @@ helm upgrade --install \
   -n networking --create-namespace
 
 # local path provisioner
-LOCAL_PATH_VERSION=v0.0.28
+LOCAL_PATH_VERSION=v0.0.29
 git clone https://github.com/rancher/local-path-provisioner.git
 cd local-path-provisioner
 git checkout $LOCAL_PATH_VERSION
