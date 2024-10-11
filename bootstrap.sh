@@ -30,19 +30,6 @@ helm upgrade --install \
   -f config/cilium.yaml \
   -n networking --create-namespace
 
-# local path provisioner
-LOCAL_PATH_VERSION=v0.0.29
-git clone https://github.com/rancher/local-path-provisioner.git
-cd local-path-provisioner
-git checkout $LOCAL_PATH_VERSION
-helm upgrade --install \
-  local-path-provisioner \
-  ./deploy/chart/local-path-provisioner \
-  -f ../config/local-path-provisioner.yaml \
-  -n storage --create-namespace
-cd ..
-rm -rf local-path-provisioner
-
 # sealed secrets
 SECRETS_NAMESPACE=secrets
 kubectl create namespace $SECRETS_NAMESPACE \
