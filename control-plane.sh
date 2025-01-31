@@ -5,6 +5,7 @@ set -euo pipefail
 install_scripts=(
   "scripts/apt.sh"
   "scripts/swap.sh"
+  "scripts/ntp.sh"
   "scripts/network.sh"
   "scripts/containerd.sh"
   "scripts/kubernetes.sh"

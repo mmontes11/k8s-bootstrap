@@ -18,6 +18,7 @@ fi
 INSTALL_SCRIPTS=(
   "scripts/apt.sh"
   "scripts/swap.sh"
+  "scripts/ntp.sh"
   "scripts/network.sh"
   "scripts/storage.sh"
   "scripts/containerd.sh"
