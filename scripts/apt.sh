@@ -5,6 +5,8 @@ set -euo pipefail
 apt update
 apt upgrade -y
 
+apt purge -y systemd-timesyncd
+
 apt install \
   apt-transport-https \
   ca-certificates \
@@ -24,6 +26,8 @@ apt install \
   lsb-release \
   net-tools \
   nfs-common \
+  ntp \
+  ntpsec \
   openssh-server \
   openssl \
   sed \
