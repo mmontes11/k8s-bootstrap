@@ -10,6 +10,7 @@ apt purge -y systemd-timesyncd
 apt install \
   apt-transport-https \
   ca-certificates \
+  chrony \
   conntrack \
   curl \
   gawk \
@@ -26,8 +27,6 @@ apt install \
   lsb-release \
   net-tools \
   nfs-common \
-  ntp \
-  ntpsec \
   openssh-server \
   openssl \
   sed \
