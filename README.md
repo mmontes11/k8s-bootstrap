@@ -28,7 +28,7 @@ Setup the control-plane by running:
 sudo bash control-plane.sh
 ```
 
-Copy the generated configuration files `config/kubeadm-join.<node-type>.yaml` to each node and run this command to join the cluster:
+Copy the kubeadm configuration files `config/kubeadm-join.<node-type>.yaml` to each node and run this command to join the cluster:
 ```bash
 sudo bash node.sh 'config/kubeadm-join.<node-type>.yaml' 
 ``` 
@@ -41,6 +41,35 @@ export GITHUB_BRANCH=main
 export GITHUB_PATH=clusters/homelab
 export GITHUB_TOKEN=<your-personal-access-token>
 ./bootstrap.sh
+```
+
+### Add node to a existing Talos cluster
+
+Obtain the kubelet configuration from the Talos control-plane:
+
+```bash
+TALOS_CONTROLPLANE=<host> ./scripts/talos-kubelet-config.sh
+```
+
+Copy the kubelet configuration to the node:
+
+```bash
+CONFIG=./talos
+NODE=<host>
+
+ssh root@$NODE "mkdir -p /etc/kubernetes/pki"
+ssh root@$NODE "mkdir -p /var/lib/kubelet"
+
+scp $CONFIG/bootstrap-kubelet.conf root@$NODE:/etc/kubernetes/bootstrap-kubelet.conf
+scp $CONFIG/kubelet.conf root@$NODE:/etc/kubernetes/kubelet.conf
+scp $CONFIG/ca.crt root@$NODE:/etc/kubernetes/pki/ca.crt
+scp $CONFIG/config.yaml root@$NODE:/var/lib/kubelet/config.yaml
+```
+
+Copy the kubeadm configuration files `config/kubeadm-join.<node-type>.yaml` to the node and run this command to join the cluster:
+
+```bash
+sudo bash node.sh 'config/kubeadm-join.<node-type>.yaml' 
 ``` 
 
 ### Kubeconfig

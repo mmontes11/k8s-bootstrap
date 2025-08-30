@@ -50,3 +50,6 @@ charts/**/charts/*.tgz
 /config/kubeadm-join.*.yaml
 /certs
 dist/
+
+# kubelet config
+/kubelet
