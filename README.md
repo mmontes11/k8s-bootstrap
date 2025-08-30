@@ -54,7 +54,7 @@ TALOS_CONTROLPLANE=<host> ./scripts/talos-kubelet-config.sh
 Copy the kubelet configuration to the node:
 
 ```bash
-CONFIG=./talos
+CONFIG=./kubelet
 NODE=<host>
 
 ssh root@$NODE "mkdir -p /etc/kubernetes/pki"
