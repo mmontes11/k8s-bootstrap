@@ -21,7 +21,6 @@ sed -i "/server:/ s|:.*|: https://${TALOS_CONTROLPLANE}:6443|g" \
 clusterDomain=$(talosctl -n "$TALOS_CONTROLPLANE" get kubeletconfig -o jsonpath="{.spec.clusterDomain}")
 clusterDNS=$(talosctl -n "$TALOS_CONTROLPLANE" get kubeletconfig -o jsonpath="{.spec.clusterDNS}")
 
-# Generate kubelet config file
 cat > "$CONFIG/config.yaml" <<EOT
 kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
