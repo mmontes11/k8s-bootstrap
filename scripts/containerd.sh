@@ -15,7 +15,7 @@ if [ -z $ARCH ]; then
   exit 1
 fi
 
-CONTAINERD_VERSION=1.7.20-1
+CONTAINERD_VERSION=1.7.27-1
 
 install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
