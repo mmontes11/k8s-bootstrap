@@ -54,14 +54,14 @@ runtimeRequestTimeout: "0s"
 cgroupDriver: systemd
 EOT
 
-cat > "$CONFIG/20-talos.conf" <<'EOT'
+KUBELET_KUBECONFIG_ARGS="--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf"
+KUBELET_CONFIG_ARGS="--config=/var/lib/kubelet/config.yaml --container-runtime-endpoint=unix:///run/containerd/containerd.sock --cgroup-driver=systemd"
+KUBELET_EXTRA_ARGS=${KUBELET_EXTRA_ARGS:-""}
+cat > "$CONFIG/20-talos.conf" <<EOT
 [Service]
-Environment="KUBELET_KUBECONFIG_ARGS=--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf --container-runtime=remote --container-runtime-endpoint=unix:///run/containerd/containerd.sock --runtime-request-timeout=10m --cgroup-driver=systemd"
-Environment="KUBELET_CONFIG_ARGS=--config=/var/lib/kubelet/config.yaml"
-# Optional extra args
 EnvironmentFile=-/etc/default/kubelet
 ExecStart=
-ExecStart=/usr/bin/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_CONFIG_ARGS $KUBELET_EXTRA_ARGS
+ExecStart=/usr/bin/kubelet ${KUBELET_KUBECONFIG_ARGS} ${KUBELET_CONFIG_ARGS} ${KUBELET_EXTRA_ARGS}
 EOT
 
 echo "Copying config files to remote node: $TARGET_NODE"

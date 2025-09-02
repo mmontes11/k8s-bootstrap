@@ -45,11 +45,12 @@ export GITHUB_TOKEN=<your-personal-access-token>
 
 ### Add node to a existing Talos cluster
 
-Obtain the Kubernetes configuration files from the Talos control-plane and copy them to a target node:
+Generate the Kubernetes configuration files from the Talos control-plane and copy them to the target node:
 
 ```bash
 TALOS_CONTROLPLANE=<host> \
 TARGET_NODE=<host> \
+KUBELET_EXTRA_ARGS="--node-labels=node.mmontes.io/type=<type> --register-with-taints=node.mmontes.io/type=<type>:NoSchedule" \
 ./scripts/talos-config.sh
 ```
 
