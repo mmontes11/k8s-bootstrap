@@ -5,7 +5,7 @@
 
 Bootstrap Kubernetes clusters on Raspberry Pi using [kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/).
 
-You may also take a look at the Talos installation: [k8s-bootstrap-talos](https://github.com/mmontes11/k8s-bootstrap-talos).
+The workload cluster is bootstrapped by [Flux](https://fluxcd.io/) using the [k8s-infrastructure](https://github.com/mmontes11/k8s-infrastructure) repository.
 
 ### System compatibility
 
@@ -69,3 +69,8 @@ bash node.sh
 - `/etc/kubernetes/super-admin.conf`
 
 This [article](https://raesene.github.io/blog/2024/01/06/when-is-admin-not-admin/) depicts the differences between them.
+
+### Alternative installation flavours
+
+- [k8s-management](https://github.com/mmontes11/k8s-management): Cluster API based installation.
+- [k8s-bootstrap-talos](https://github.com/mmontes11/k8s-bootstrap-talos): Talos based installation.
