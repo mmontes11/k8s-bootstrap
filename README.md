@@ -54,7 +54,7 @@ KUBELET_EXTRA_ARGS="--node-labels=node.mmontes.io/type=<type> --register-with-ta
 ./scripts/talos-config.sh
 ```
 
-Run this command __in the node__ to join the cluster:
+Run this command __in the target node__ to join the cluster:
 
 ```bash
 sudo \
