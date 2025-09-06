@@ -54,10 +54,12 @@ KUBELET_EXTRA_ARGS="--node-labels=node.mmontes.io/type=<type> --register-with-ta
 ./scripts/talos-config.sh
 ```
 
-Copy the kubeadm configuration files `config/kubeadm-join.<node-type>.yaml` to the node and run this command to join the cluster:
+Run this command __in the node__ to join the cluster:
 
 ```bash
-sudo bash node.sh 'config/kubeadm-join.<node-type>.yaml' 
+sudo \
+SKIP_KUBEADM_JOIN="true" \
+bash node.sh
 ``` 
 
 ### Kubeconfig
