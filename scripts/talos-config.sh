@@ -51,11 +51,13 @@ authorization:
 clusterDomain: "$clusterDomain"
 clusterDNS: $clusterDNS
 runtimeRequestTimeout: "0s"
+containerRuntimeEndpoint: unix:///run/containerd/containerd.sock
 cgroupDriver: systemd
+serverTLSBootstrap: true
 EOT
 
 KUBELET_KUBECONFIG_ARGS="--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf"
-KUBELET_CONFIG_ARGS="--config=/var/lib/kubelet/config.yaml --container-runtime-endpoint=unix:///run/containerd/containerd.sock --cgroup-driver=systemd"
+KUBELET_CONFIG_ARGS="--config=/var/lib/kubelet/config.yaml"
 KUBELET_EXTRA_ARGS=${KUBELET_EXTRA_ARGS:-""}
 cat > "$CONFIG/20-talos.conf" <<EOT
 [Service]
