@@ -4,7 +4,7 @@ set -eo pipefail
 
 GITHUB_USER=${GITHUB_USER:-mmontes11}
 GITHUB_REPO=${GITHUB_REPO:-k8s-infrastructure }
-GITHUB_BRANCH=${GITHUB_BRANCH:-v3} # TODO: update default branch to main
+GITHUB_BRANCH=${GITHUB_BRANCH:-main}
 GITHUB_PATH=${GITHUB_PATH:-clusters/homelab}
 if [ -z "$GITHUB_TOKEN" ]; then
   echo "GITHUB_TOKEN environment variable must be provided"
