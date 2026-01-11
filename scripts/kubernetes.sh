@@ -6,7 +6,7 @@ set -euo pipefail
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl
 
 KUBERNETES_VERSION=${KUBERNETES_VERSION:-v1.35}
-KUBERNETES_PKG=${KUBERNETES_PKG:v1.35.0-1.1}
+KUBERNETES_PKG=${KUBERNETES_PKG:-1.35.0-1.1}
 
 if [ -n "${UPGRADE:-}" ]; then
   echo "🛑 Stopping kubelet..."
