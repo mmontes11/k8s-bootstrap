@@ -43,7 +43,7 @@ export GITHUB_TOKEN=<your-personal-access-token>
 ./bootstrap.sh
 ```
 
-### Add node to a existing Talos cluster
+### Add worker node to a existing Talos cluster
 
 Generate the Kubernetes configuration files from the Talos control-plane and copy them to the target node:
 
@@ -60,6 +60,24 @@ Run this command __in the target node__ to join the cluster:
 sudo \
 SKIP_KUBEADM_JOIN="true" \
 bash node.sh
+```
+
+### Upgrade worker node
+
+Run the following commands to upgrade containerd and kubelet in a worker node:
+
+```bash
+sudo \
+UPGRADE="1" \
+CONTAINERD_VERSION="2.2.1-1~ubuntu.24.04~noble" \
+bash scripts/containerd.sh
+```
+```bash
+sudo \
+UPGRADE="1" \
+KUBERNETES_VERSION="v1.35" \
+KUBERNETES_PKG="1.35.0-1.1" \
+bash scripts/kubernetes.sh
 ``` 
 
 ### Kubeconfig
