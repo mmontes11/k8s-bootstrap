@@ -3,13 +3,13 @@
 [![CI](https://github.com/mmontes11/k8s-bootstrap/actions/workflows/ci.yml/badge.svg)](https://github.com/mmontes11/k8s-bootstrap/actions/workflows/ci.yml)
 [![Release](https://github.com/mmontes11/k8s-bootstrap/actions/workflows/release.yml/badge.svg)](https://github.com/mmontes11/k8s-bootstrap/actions/workflows/release.yml)
 
-Bootstrap Kubernetes clusters on Raspberry Pi using [kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/).
+Bootstrap Kubernetes clusters using [kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/).
 
 The workload cluster is bootstrapped by [Flux](https://fluxcd.io/) using the [k8s-infrastructure](https://github.com/mmontes11/k8s-infrastructure) repository.
 
 ### System compatibility
 
-This Kubernetes installation has been verified on Ubuntu 24.04 running on both Raspberry Pi 4 and 5.
+This Kubernetes installation has been verified on Ubuntu 24.04.
 
 ### Node preparation
 
