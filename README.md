@@ -7,6 +7,11 @@ Bootstrap Kubernetes clusters using [kubeadm](https://kubernetes.io/docs/setup/p
 
 The workload cluster is bootstrapped by [Flux](https://fluxcd.io/) using the [k8s-infrastructure](https://github.com/mmontes11/k8s-infrastructure) repository.
 
+### Alternative installation flavours
+
+- [k8s-management](https://github.com/mmontes11/k8s-management): Cluster API based installation.
+- [k8s-bootstrap-talos](https://github.com/mmontes11/k8s-bootstrap-talos): Talos based installation.
+
 ### System compatibility
 
 This Kubernetes installation has been verified on Ubuntu 24.04.
@@ -87,8 +92,3 @@ bash scripts/kubernetes.sh
 - `/etc/kubernetes/super-admin.conf`
 
 This [article](https://raesene.github.io/blog/2024/01/06/when-is-admin-not-admin/) depicts the differences between them.
-
-### Alternative installation flavours
-
-- [k8s-management](https://github.com/mmontes11/k8s-management): Cluster API based installation.
-- [k8s-bootstrap-talos](https://github.com/mmontes11/k8s-bootstrap-talos): Talos based installation.
