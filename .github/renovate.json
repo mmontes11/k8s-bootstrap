@@ -38,7 +38,7 @@
       ],
       "datasourceTemplate": "deb",
       "packageNameTemplate": "containerd.io",
-      "registryUrlTemplate": "https://download.docker.com/linux/ubuntu"
+      "registryUrlTemplate": "https://download.docker.com/linux/ubuntu?components=stable"
     },
     {
       "customType": "regex",
