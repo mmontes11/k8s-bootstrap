@@ -36,8 +36,9 @@
       "matchStrings": [
         "CONTAINERD_VERSION=\\$\\{CONTAINERD_VERSION:-\"?(?<currentValue>[^\"]+)\"?\\}"
       ],
-      "datasourceTemplate": "github-releases",
-      "packageNameTemplate": "containerd/containerd"
+      "datasourceTemplate": "deb",
+      "packageNameTemplate": "containerd.io",
+      "registryUrlTemplate": "https://download.docker.com/linux/ubuntu"
     },
     {
       "customType": "regex",
@@ -63,6 +64,15 @@
     }
   ],
   "packageRules": [
+    {
+      "matchDatasources": [
+        "deb"
+      ],
+      "matchPackageNames": [
+        "containerd.io"
+      ],
+      "groupName": "containerd"
+    },
     {
       "matchDatasources": [
         "github-releases"
