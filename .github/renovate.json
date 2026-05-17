@@ -31,18 +31,6 @@
     {
       "customType": "regex",
       "managerFilePatterns": [
-        "/^scripts/containerd\\.sh$/"
-      ],
-      "matchStrings": [
-        "CONTAINERD_VERSION=\\$\\{CONTAINERD_VERSION:-\"?(?<currentValue>[^\"]+)\"?\\}"
-      ],
-      "datasourceTemplate": "deb",
-      "packageNameTemplate": "containerd.io",
-      "registryUrlTemplate": "https://download.docker.com/linux/ubuntu?components=stable"
-    },
-    {
-      "customType": "regex",
-      "managerFilePatterns": [
         "/^scripts/kubernetes\\.sh$/"
       ],
       "matchStrings": [
@@ -64,15 +52,6 @@
     }
   ],
   "packageRules": [
-    {
-      "matchDatasources": [
-        "deb"
-      ],
-      "matchPackageNames": [
-        "containerd.io"
-      ],
-      "groupName": "containerd"
-    },
     {
       "matchDatasources": [
         "github-releases"
