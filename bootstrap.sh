@@ -22,7 +22,7 @@ kubectl apply -f \
   https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-${PROMETHEUS_VERSION}/charts/kube-prometheus-stack/charts/crds/crds/crd-servicemonitors.yaml
 
 # cilium
-CILIUM_VERSION=1.16.1
+CILIUM_VERSION=1.19.4
 helm repo add cilium https://helm.cilium.io/
 helm repo update
 helm upgrade --install \
