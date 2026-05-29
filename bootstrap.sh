@@ -17,7 +17,7 @@ kubectl get csr \
   | xargs -r kubectl certificate approve
 
 # prometheus crds (required by cilium)
-PROMETHEUS_VERSION="62.3.1"
+PROMETHEUS_VERSION="86.0.1"
 kubectl apply -f \
   https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-${PROMETHEUS_VERSION}/charts/kube-prometheus-stack/charts/crds/crds/crd-servicemonitors.yaml
 
