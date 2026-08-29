@@ -48,6 +48,13 @@ export GITHUB_TOKEN=<your-personal-access-token>
 ./bootstrap.sh
 ```
 
+### Raspberry Pi 5 NVMe storage nodes
+
+Storage nodes booting from onboard NVMe are provisioned with a dedicated raw partition
+for rook-ceph. See [docs/rpi5-nvme-storage-node.md](docs/rpi5-nvme-storage-node.md) for
+the migration runbook and [scripts/cleanup-nvme.sh](scripts/cleanup-nvme.sh) (which only
+wipes the rook partition when the OS runs from the same disk).
+
 ### Add worker node to a existing Talos cluster
 
 Generate the Kubernetes configuration files from the Talos control-plane and copy them to the target node:
