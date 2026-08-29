@@ -52,8 +52,9 @@ export GITHUB_TOKEN=<your-personal-access-token>
 
 Storage nodes booting from onboard NVMe are provisioned with a dedicated raw partition
 for rook-ceph. See [docs/rpi5-nvme-storage-node.md](docs/rpi5-nvme-storage-node.md) for
-the migration runbook and [scripts/cleanup-nvme.sh](scripts/cleanup-nvme.sh) (which only
-wipes the rook partition when the OS runs from the same disk).
+the migration runbook — including the golden-image flow used to set up the remaining
+nodes — and [scripts/cleanup-nvme.sh](scripts/cleanup-nvme.sh) (wipes the rook-ceph
+partition, `/dev/nvme0n1p3` by default; no checks, the caller provides the target device).
 
 ### Add worker node to a existing Talos cluster
 
