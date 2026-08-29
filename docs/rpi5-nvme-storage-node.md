@@ -3,7 +3,8 @@
 Migrates a Raspberry Pi 5 worker/storage node from an SD-card root filesystem to the 2TB
 onboard NVMe module, so the OS lives on fast, durable storage while keeping a dedicated raw
 partition for the [rook-ceph](https://rook.io/) OSD. After the first node is migrated, its
-disk is captured as a byte-for-byte golden image and `dd`'d onto the remaining nodes.
+disk is captured as a compressed, byte-for-byte golden image pushed to a NAS over NFS, and
+piped (decompressed) onto the remaining nodes.
 
 No second Linux machine or USB NVMe enclosure is needed: a freshly flashed microSD card
 boots every node as the staging OS, and the NVMe image/partition work is done from there —
@@ -56,16 +57,18 @@ OS/OSD split, change it consistently in Steps 5 and 6 — nowhere else.
 
 - The node's own hardware: a **fresh ≥16GB microSD card** (the "staging OS" medium, reused
   per node) and the node's **original SD card** (kept untouched for rollback).
-- A small USB stick to hold the golden image: the disk is compressed on capture (`zstd`),
-  and a fresh OS install plus an empty partition compresses to a few hundred MB, so even an
-  8GB stick is plenty.
+- The **NAS** hosting the golden image: `10.0.0.50:/volume1/images`, an NFS export that is
+  readable and writable from any IP in `10.0.0.0/24`, mounted at `/mnt/nas` on the staging
+  OS. The disk is piped compressed (`zstd`) to it over the network at capture time, and the
+  compressed stream is piped back on restore — nothing but pipeline buffers touches local
+  disk, so the machines never need 2TB of free space.
 - The Ubuntu 24.04 preinstalled server image for Raspberry Pi
   (`ubuntu-24.04.4-preinstalled-server-arm64+raspi.img.xz` from the
   [Ubuntu releases](https://cdimage.ubuntu.com/releases/24.04/release/) archive, or via
   rpi-imager's built-in catalog).
 - rpi-imager on whatever machine you already use to image SD cards.
 - Once the staging OS is booted on the Pi: `sudo apt update && sudo apt install -y
-  rpi-imager parted gdisk zstd` (`e2fsprogs` ships with the base image).
+  rpi-imager parted gdisk zstd nfs-common` (`e2fsprogs` ships with the base image).
 
 ## Migrating the first node (storage-2) — produces the golden image
 
@@ -99,7 +102,7 @@ Image the fresh SD card with rpi-imager as you would any node (customize hostnam
 on, and SSH in.
 
 ```bash
-sudo apt update && sudo apt install -y rpi-imager parted gdisk zstd
+sudo apt update && sudo apt install -y rpi-imager parted gdisk zstd nfs-common
 lsblk -f      # the NVMe must be visible; it still holds the old OSD's data
 ```
 
@@ -173,21 +176,23 @@ sudo umount /mnt/nvfat
 
 ### Step 7 — Capture the golden image (before first boot, `p3` still raw)
 
-Back up the fully partitioned, not-yet-booted disk to the USB stick, compressed on the fly
-(the disk is mostly zeros — the raw `p3` and the unused portion of `p2` dominate, so the
-compression ratio is very high):
+Push the fully partitioned, not-yet-booted disk to the NAS over NFS as a pure pipe (the disk
+is mostly zeros — the raw `p3` and the unused portion of `p2` dominate, so the compression
+ratio is very high; at no point is a 2TB file written to local disk):
 
 ```bash
-# /dev/sdc = the USB stick — verify with lsblk so you never write to the NVMe
-sudo dd if=/dev/nvme0n1 bs=4M | sudo zstd -T0 -o /dev/sdc/rpi5-nvme-golden.img.zst
-sha256sum /dev/sdc/rpi5-nvme-golden.img.zst | tee /dev/sdc/rpi5-nvme-golden.img.zst.sha256
+sudo mkdir -p /mnt/nas
+sudo mount -t nfs 10.0.0.50:/volume1/images /mnt/nas
+
+# NVMe read → compress (all cores) → push over NFS
+sudo dd if=/dev/nvme0n1 bs=4M | sudo zstd -T0 -o /mnt/nas/rpi5-nvme-golden.img.zst
+sudo sha256sum /mnt/nas/rpi5-nvme-golden.img.zst | sudo tee /mnt/nas/rpi5-nvme-golden.img.zst.sha256
 sync
 ```
 
-The full-disk read is the dominant cost (a couple of minutes at NVMe speed); `zstd -T0`
-uses all cores. A fresh Ubuntu 24.04 install plus an empty partition compresses to roughly a
-few hundred MB, and the `.sha256` side file verifies it locally. Keep a copy of this image
-(and its checksum) safe — it sets up the remaining nodes.
+The full-disk read is the dominant cost (a couple of minutes at NVMe speed); what traverses
+the network is the compressed file, roughly a few hundred MB. The `.sha256` side file is
+what every restore verifies against before overwriting an NVMe.
 
 ### Step 8 — First NVMe boot
 
@@ -264,14 +269,19 @@ applied by Flux** before this step.
 
 1. **Pre-flight**: per safety rule 2, the cluster must be converged with no missing OSDs.
 2. **Take the node out**: `kubectl drain <node> ...`, power off, keep its original SD card.
-3. **Stage**: fresh (or re-imaged) SD card per Step 3; attach the USB stick holding
-   `rpi5-nvme-golden.img.zst`.
-4. **Verify and restore the image onto the NVMe** (no rpi-imager, no partition surgery;
-   decompression happens in the pipeline, nothing lands on disk as a 2TB image):
+3. **Stage**: fresh (or re-imaged) SD card per Step 3. No USB stick is needed — the image
+   comes over the network: the NFS export is writable/readable from any IP in `10.0.0.0/24`.
+4. **Pull, verify and restore the image onto the NVMe** (no rpi-imager, no partition
+   surgery; the compressed stream is pulled over NFS and decompressed in the pipeline
+   straight onto the NVMe — nothing lands on local disk as a 2TB image):
 
    ```bash
-   sha256sum -c /dev/sdc/rpi5-nvme-golden.img.zst.sha256
-   sudo zstd -dc /dev/sdc/rpi5-nvme-golden.img.zst | sudo dd of=/dev/nvme0n1 bs=4M status=progress
+   sudo mkdir -p /mnt/nas
+   sudo mount -t nfs 10.0.0.50:/volume1/images /mnt/nas
+   sudo sha256sum -c /mnt/nas/rpi5-nvme-golden.img.zst.sha256
+
+   # NFS read → decompress (all cores) → NVMe write
+   sudo zstd -dc /mnt/nas/rpi5-nvme-golden.img.zst | sudo dd of=/dev/nvme0n1 bs=4M status=progress
    sync
    ```
 
