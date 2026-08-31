@@ -155,14 +155,22 @@ grow.)
 ### Step 6 — Per-node configuration into the NVMe boot partition
 
 The freshly written image has no hostname/user/networking customization. Copy the
-customized files from the staging SD's boot partition onto the NVMe's `p1` (the tutorial
-does the same), then edit them for this node:
+customized `user-data`/`network-config` files from the staging SD's boot partition onto
+the NVMe's `p1` (the tutorial does the same), then edit them for this node:
 
 ```bash
 sudo mkdir /mnt/nvfat
 sudo mount /dev/nvme0n1p1 /mnt/nvfat
-sudo cp /boot/firmware/cmdline.txt /boot/firmware/user-data /boot/firmware/network-config /mnt/nvfat/
+sudo cp /boot/firmware/user-data /boot/firmware/network-config /mnt/nvfat/
 ```
+
+**Do not copy `cmdline.txt`.** rpi-imager stamps every write with a fresh, randomized
+disk signature, and the NVMe's own `cmdline.txt` (written in Step 4) already has the
+`root=PARTUUID=...` matching *its own* `p2`. The staging SD's `cmdline.txt` encodes the
+SD's PARTUUID instead — copying it over would point the NVMe's root= at a partition that
+no longer exists once the SD is removed, and the node would fail to boot. Leave the
+NVMe's `cmdline.txt` as rpi-imager wrote it; Step 8 appends the required boot parameters
+to it in place.
 
 Edit the copies on the mounted `p1`:
 
@@ -244,7 +252,9 @@ Precondition: the companion PR in `mmontes11/k8s-infrastructure`, which switches
 `infrastructure/rook/rook-ceph-cluster/rook-ceph-cluster-helmrelease.yaml`, **is merged and
 applied by Flux** before this step.
 
-1. Remove the old OSD from the cluster (its data was wiped in Step 4):
+1. Remove the old OSD from the cluster (its data was wiped in Step 4). Substitute `3`
+   below with the OSD id you noted for this node in Step 1 (`osd-3` on `storage-2` at
+   the time of writing — it will differ for `storage-1`/`storage-0`):
 
    ```bash
    kubectl -n storage exec deploy/rook-ceph-tools -- ceph osd out 3
