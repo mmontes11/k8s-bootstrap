@@ -48,14 +48,6 @@ export GITHUB_TOKEN=<your-personal-access-token>
 ./bootstrap.sh
 ```
 
-### Raspberry Pi 5 NVMe storage nodes
-
-Storage nodes booting from onboard NVMe are provisioned with a dedicated raw partition
-for rook-ceph. See [docs/rpi5-nvme-storage-node.md](docs/rpi5-nvme-storage-node.md) for
-the migration runbook — including the golden-image flow used to set up the remaining
-nodes — and [scripts/cleanup-nvme.sh](scripts/cleanup-nvme.sh) (wipes the rook-ceph
-partition, `/dev/nvme0n1p3` by default; no checks, the caller provides the target device).
-
 ### Add worker node to a existing Talos cluster
 
 Generate the Kubernetes configuration files from the Talos control-plane and copy them to the target node:
@@ -100,3 +92,11 @@ bash scripts/kubernetes.sh
 - `/etc/kubernetes/super-admin.conf`
 
 This [article](https://raesene.github.io/blog/2024/01/06/when-is-admin-not-admin/) depicts the differences between them.
+
+### Raspberry Pi 5 NVMe storage nodes
+
+Storage nodes booting from onboard NVMe are provisioned with a dedicated raw partition
+for rook-ceph. See [docs/rpi5-nvme-storage-node.md](docs/rpi5-nvme-storage-node.md) for
+the migration runbook — including the golden-image flow used to set up the remaining
+nodes — and [scripts/cleanup-nvme.sh](scripts/cleanup-nvme.sh) (wipes the rook-ceph
+partition, `/dev/nvme0n1p3` by default; no checks, the caller provides the target device).
