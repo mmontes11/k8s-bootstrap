@@ -41,7 +41,7 @@ OS/OSD split, change it consistently in Steps 5 and 6 — nowhere else.
    degradation and can leave the cluster unrecoverable. Check on the control plane:
 
    ```bash
-   kubectl -n storage exec deploy/rook-ceph-tools -- ceph -s
+   kubectl rook-ceph -n storage ceph -s
    ```
 
 3. **Keep the original SD card until the node is fully back in service** (see
@@ -55,6 +55,10 @@ OS/OSD split, change it consistently in Steps 5 and 6 — nowhere else.
 
 ## Tools and hardware
 
+- The [kubectl-rook-ceph](https://github.com/rook/kubectl-rook-ceph) krew plugin on the
+  control plane (`krew install rook-ceph`). All Ceph/rook inspection and removal commands
+  in this runbook go through it. The cluster lives in namespace `storage`, not the
+  plugin's default `rook-ceph`, so **every** call below passes `-n storage`.
 - The node's own hardware: a **fresh ≥16GB microSD card** (the "staging OS" medium, reused
   per node) and the node's **original SD card** (kept untouched for rollback).
 - The **NAS** hosting the golden image: `10.0.0.50:/volume1/images`, an NFS export that is
@@ -75,14 +79,14 @@ OS/OSD split, change it consistently in Steps 5 and 6 — nowhere else.
 ### Step 1 — Pre-flight on the control plane
 
 ```bash
-kubectl -n storage exec deploy/rook-ceph-tools -- ceph -s
+kubectl rook-ceph -n storage ceph -s
 kubectl get nodes -l node.mmontes.io/type=storage
-kubectl -n storage get pods -l app=rook-ceph-osd -o wide    # note which osd pod runs on the target node
+kubectl rook-ceph -n storage ceph osd tree   # note which osd id lives on the target node
 ```
 
 Per safety rule 2: the cluster must be converged (no missing OSDs, no in-flight
-backfills). Note the OSD id of the target node (e.g. `osd-3` on `storage-2`) — you need it
-in [Step 10](#step-10-rook-osd-migration).
+backfills). Note the OSD id of the target node from the tree (e.g. `3` on `storage-2`) —
+you need it in [Step 10](#step-10-rook-osd-migration).
 
 ### Step 2 — Take the node out of the cluster
 
@@ -252,25 +256,51 @@ Precondition: the companion PR in `mmontes11/k8s-infrastructure`, which switches
 `infrastructure/rook/rook-ceph-cluster/rook-ceph-cluster-helmrelease.yaml`, **is merged and
 applied by Flux** before this step.
 
+**What is happening between rejoin (Step 9) and the purge below.** The old
+`rook-ceph-osd-<id>` deployment is rescheduled onto the rejoined node, but its `activate`
+init container cannot find the old OSD's bluestore metadata on the rewritten disk and
+exits — the pod `CrashLoopBackOff`s. That is expected and harmless: `ceph-volume raw
+activate` only *reads* device metadata, it never formats. Likewise the operator's
+recurring prepare job finds no available devices: `ceph-volume inventory` rejects
+`nvme0n1` because it now carries the OS's GPT table, so the OS disk is not re-prepared.
+The new OSD on `nvme0n1p3` appears only when Flux reconciles the device-entry change —
+it is *not* triggered by removing the old OSD.
+
 1. Remove the old OSD from the cluster (its data was wiped in Step 4). Substitute `3`
-   below with the OSD id you noted for this node in Step 1 (`osd-3` on `storage-2` at
-   the time of writing — it will differ for `storage-1`/`storage-0`):
+   below with the OSD id you noted for this node in Step 1 (`3` on `storage-2` at the
+   time of writing — it will differ for `storage-1`/`storage-0`):
 
    ```bash
-   kubectl -n storage exec deploy/rook-ceph-tools -- ceph osd out 3
-   kubectl -n storage exec deploy/rook-ceph-tools -- ceph osd rm 3
-   kubectl -n storage exec deploy/rook-ceph-tools -- ceph -s
+   kubectl rook-ceph -n storage rook purge-osd 3
+   kubectl rook-ceph -n storage ceph -s
    ```
 
-2. Rook discovers the raw `nvme0n1p3` and creates a new OSD on it. Watch it come up:
+   `rook purge-osd` is the operator's single command for OSD removal. It skips OSDs that
+   are still up, marks the OSD out, then **blocks until Ceph reports it safe to
+   destroy** — in this scenario the PGs already recovered onto the other two OSDs during
+   the offline window (the rule 2 check), so it passes quickly. It then deletes the old
+   OSD deployment (ending the crash loop), purges the OSD from the cluster, and archives
+   its crash reports. Do **not** pass `--force`: it only skips the down check and adds
+   data-loss risk without any benefit here. Note the command also attempts
+   `ceph osd crush rm host storage-2`; that fails harmlessly (and is ignored) if the new
+   OSD is already up on the node.
+
+2. The operator's prepare job picks up the changed device entry and provisions a new OSD
+   on the raw `nvme0n1p3`; it started as soon as Flux reconciled the helmrelease, so it
+   may already be under way. Watch it come up:
 
    ```bash
    kubectl -n storage get pods -l app=rook-ceph-osd -o wide
-   kubectl -n storage get osds
-   kubectl -n storage exec deploy/rook-ceph-tools -- ceph -s   # backfilling will show, converging
+   kubectl rook-ceph -n storage ceph osd tree
+   kubectl rook-ceph -n storage ceph -s   # backfilling will show, converging
    ```
 
-3. Wait for convergence (all PGs `active+clean`) before migrating the next node.
+3. Wait for convergence (all PGs `active+clean`) before migrating the next node, then
+   finish with a full health check — it should report no OSD-related warnings:
+
+   ```bash
+   kubectl rook-ceph -n storage health
+   ```
 
 ## Migrating the remaining nodes from the golden image
 
@@ -344,6 +374,6 @@ anything goes wrong:
 3. Rook still expects `nvme0n1`; if you already merged the `nvme0n1p3` change, revert that
    entry (Flux will apply it) and the old whole-disk device is valid again — then wipe it
    first with `scripts/cleanup-nvme.sh /dev/nvme0n1`, because the image/partition surgery
-   destroyed the old OSD data. If you already ran `ceph osd rm`, the old OSD id is gone
-   from the cluster: with two healthy OSDs the data is safe, but re-plan the migration
-   instead of hot-fixing.
+   destroyed the old OSD data. If you already ran `rook purge-osd`, the old OSD id is
+   gone from the cluster: with two healthy OSDs the data is safe, but re-plan the
+   migration instead of hot-fixing.
