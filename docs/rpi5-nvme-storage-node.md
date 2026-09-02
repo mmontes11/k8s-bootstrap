@@ -38,10 +38,12 @@ OS/OSD split, change it consistently in Steps 5 and 6 — nowhere else.
    window. That is expected and acceptable. What is **not** acceptable is starting the
    migration while the cluster is *already* degraded or converging (missing OSD, or
    `active+undersized+...+backfilling` PGs from a previous event) — that stacks a second
-   degradation and can leave the cluster unrecoverable. Check on the control plane:
+   degradation and can leave the cluster unrecoverable. Check on the control plane
+   (via the `kubectl rook-ceph` plugin — see [Tools and hardware](#tools-and-hardware)):
 
    ```bash
-   kubectl -n storage exec deploy/rook-ceph-tools -- ceph -s
+   kubectl rook-ceph -n storage ceph status
+   kubectl rook-ceph -n storage health    # structured pre-flight: PG states, mon quorum, OSD distribution
    ```
 
 3. **Keep the original SD card until the node is fully back in service** (see
@@ -69,13 +71,23 @@ OS/OSD split, change it consistently in Steps 5 and 6 — nowhere else.
 - rpi-imager on whatever machine you already use to image SD cards.
 - Once the staging OS is booted on the Pi: `sudo apt update && sudo apt install -y
   rpi-imager parted gdisk zstd nfs-common` (`e2fsprogs` ships with the base image).
+- Control plane: `kubectl` with the
+  [kubectl-rook-ceph](https://github.com/rook/kubectl-rook-ceph) plugin, installed via
+  [krew](https://krew.sigs.k8s.io/): `kubectl krew install rook-ceph`. Two specifics of
+  this cluster:
+  - The plugin's `ceph ...` commands run inside the **`rook-ceph-operator` pod** — not a
+    toolbox (`rook-ceph-tools`), which does not exist here. The operator pod must be
+    `Running`; the plugin waits for it before exec'ing.
+  - The CephCluster lives in the `storage` namespace (the plugin's default is
+    `rook-ceph`), so **every** plugin invocation below needs `-n storage`.
 
 ## Migrating the first node (storage-2) — produces the golden image
 
 ### Step 1 — Pre-flight on the control plane
 
 ```bash
-kubectl -n storage exec deploy/rook-ceph-tools -- ceph -s
+kubectl rook-ceph -n storage ceph status
+kubectl rook-ceph -n storage health
 kubectl get nodes -l node.mmontes.io/type=storage
 kubectl -n storage get pods -l app=rook-ceph-osd -o wide    # note which osd pod runs on the target node
 ```
@@ -93,7 +105,11 @@ kubectl drain storage-2 --ignore-daemonsets --delete-emptydir-data
 ```
 
 Then power the Pi off. Its OSD is now down; the cluster runs on the remaining two OSDs
-(expected — see safety rule 2).
+(expected — see safety rule 2). The drain also evicts whatever else happens to sit on the
+node — on `storage-2` today: `mon-h`, `mgr-a`, plus the exporter and crashcollector. The
+mon/mgr deployments reschedule onto the other storage nodes (placement pins them to
+`node.mmontes.io/type=storage`); the node-pinned exporter/crashcollector deployments sit
+`0/1` until the node comes back. All of this is expected and self-heals at rejoin.
 
 ### Step 3 — Boot the staging OS from a fresh SD card
 
@@ -212,7 +228,7 @@ SSH in and verify the layout is intact (first-boot auto-grow only extends the fi
 
 ```bash
 lsblk /dev/nvme0n1
-df -h /                    # / ≈ 124G, on nvme0n1p2
+df -h /                    # on nvme0n1p2, ≈120G (the 124G fs) — or more if first-boot auto-grow extended it to the full 128GiB partition
 blkid /dev/nvme0n1p3       # must print nothing
 hostnamectl                 # must be storage-2
 ```
@@ -257,18 +273,32 @@ applied by Flux** before this step.
    the time of writing — it will differ for `storage-1`/`storage-0`):
 
    ```bash
-   kubectl -n storage exec deploy/rook-ceph-tools -- ceph osd out 3
-   kubectl -n storage exec deploy/rook-ceph-tools -- ceph osd rm 3
-   kubectl -n storage exec deploy/rook-ceph-tools -- ceph -s
+   kubectl rook-ceph -n storage ceph osd out 3
+   kubectl rook-ceph -n storage ceph osd rm 3
+   kubectl rook-ceph -n storage ceph status
    ```
 
-2. Rook discovers the raw `nvme0n1p3` and creates a new OSD on it. Watch it come up:
+   One-shot alternative: `kubectl rook-ceph -n storage rook purge-osd 3` performs the
+   operator-level removal (out + rm + bookkeeping cleanup) in a single call. It refuses
+   to act while the OSD is still up — no problem here, since the OSD has been down since
+   the node was powered off in Step 2. Do **not** pass `--force` unless the PGs are *not*
+   healthy on the remaining OSDs (that risks data loss).
+
+   Note: the CephCluster sets `removeOSDsIfOutAndSafeToRemove: false`, so rook will never
+   remove the out OSD on its own — the explicit removal above is required.
+
+2. Rook discovers the raw `nvme0n1p3` and creates a new OSD on it — with a **new** id
+   (e.g. `4`), not the removed one. Watch it come up:
 
    ```bash
-   kubectl -n storage get pods -l app=rook-ceph-osd -o wide
-   kubectl -n storage get osds
-   kubectl -n storage exec deploy/rook-ceph-tools -- ceph -s   # backfilling will show, converging
+   kubectl -n storage get pods -l app=rook-ceph-osd -o wide   # a new osd-<new-id> deployment appears, on the node
+   kubectl rook-ceph -n storage ceph osd tree                 # the new OSD joins as up/in
+   kubectl rook-ceph -n storage rook status                   # CephCluster condition: "Processing OSD ..." → Ready
+   kubectl rook-ceph -n storage ceph status                   # backfilling will show, converging
    ```
+
+   If provisioning stalls, read the operator log:
+   `kubectl rook-ceph -n storage operator logs --tail=100`.
 
 3. Wait for convergence (all PGs `active+clean`) before migrating the next node.
 
@@ -344,6 +374,6 @@ anything goes wrong:
 3. Rook still expects `nvme0n1`; if you already merged the `nvme0n1p3` change, revert that
    entry (Flux will apply it) and the old whole-disk device is valid again — then wipe it
    first with `scripts/cleanup-nvme.sh /dev/nvme0n1`, because the image/partition surgery
-   destroyed the old OSD data. If you already ran `ceph osd rm`, the old OSD id is gone
-   from the cluster: with two healthy OSDs the data is safe, but re-plan the migration
-   instead of hot-fixing.
+   destroyed the old OSD data. If you already removed the old OSD id in Step 10
+   (`ceph osd rm` or `rook purge-osd`), it is gone from the cluster: with two healthy
+   OSDs the data is safe, but re-plan the migration instead of hot-fixing.
