@@ -14,6 +14,7 @@ apt install \
   conntrack \
   curl \
   gawk \
+  gdisk \
   git \
   gnupg \
   gpg \
@@ -29,11 +30,14 @@ apt install \
   nfs-common \
   openssh-server \
   openssl \
+  parted \
+  rpi-imager \
   sed \
   socat \
   systemd \
   vim \
   wget \
+  zstd \
   -y
 
 apt autoremove -y
