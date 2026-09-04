@@ -162,27 +162,7 @@ customized `user-data`/`network-config` files from the staging SD's boot partiti
 the NVMe's `p1` (the tutorial does the same), then edit them for this node:
 
 ```bash
-sudo mkdir /mnt/nvfat
-sudo mount /dev/nvme0n1p1 /mnt/nvfat
-sudo cp /boot/firmware/user-data /boot/firmware/network-config /mnt/nvfat/
-```
-
-**Do not copy `cmdline.txt`.** rpi-imager stamps every write with a fresh, randomized
-disk signature, and the NVMe's own `cmdline.txt` (written in Step 4) already has the
-`root=PARTUUID=...` matching *its own* `p2`. The staging SD's `cmdline.txt` encodes the
-SD's PARTUUID instead — copying it over would point the NVMe's root= at a partition that
-no longer exists once the SD is removed, and the node would fail to boot. Leave the
-NVMe's `cmdline.txt` as rpi-imager wrote it; Step 8 appends the required boot parameters
-to it in place.
-
-Edit the copies on the mounted `p1`:
-
-- `user-data`: `hostname:` must be the **node name** (`storage-2`) — the node will be
-  re-joined under that name.
-- `network-config` / netplan section: the node's address, exactly as it was before.
-
-```bash
-sudo umount /mnt/nvfat
+sudo bash scripts/nvme-copy-config.sh
 ```
 
 ### Step 7 — Capture the golden image (before first boot, `p3` still raw)
