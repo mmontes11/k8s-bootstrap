@@ -60,7 +60,7 @@ OS/OSD split, change it consistently in Steps 5 and 6 — nowhere else.
 - The node's own hardware: a **fresh ≥16GB microSD card** (the "staging OS" medium, reused
   per node) and the node's **original SD card** (kept untouched for rollback).
 - The **NAS** hosting the golden image: `10.0.0.50:/volume1/images`, an NFS export that is
-  readable and writable from any IP in `10.0.0.0/24`, mounted at `/mnt/nas` on the staging
+  readable and writable from any IP in `10.0.0.0/26`, mounted at `/mnt/nas` on the staging
   OS. The disk is piped compressed (`zstd`) to it over the network at capture time, and the
   compressed stream is piped back on restore — nothing but pipeline buffers touches local
   disk, so the machines never need 2TB of free space.
@@ -147,20 +147,7 @@ Fit `p2` to end at `128GiB`, set its ext4 to `124G`, then create the raw rook pa
 `p3` from what is left:
 
 ```bash
-DEV=/dev/nvme0n1
-
-sudo parted -s $DEV print                        # sanity check: GPT, p1 fat, p2 ext4 (small)
-sudo parted -s $DEV resizepart 2 128GiB          # grow p2's end boundary to 128GiB from the start of the disk
-sudo e2fsck -f ${DEV}p2                          # check before/during resize
-sudo resize2fs ${DEV}p2 124G                     # grow the fs to 124G inside the 128GiB partition
-
-# Create the rook partition from the remainder of the disk. Do NOT format it:
-sudo parted -s $DEV mkpart rook 128GiB 100%
-sudo sgdisk -t 3:8300 $DEV                       # explicit "Linux filesystem" partition type
-
-# Verify:
-sudo parted -s $DEV print
-sudo blkid ${DEV}p2 ${DEV}p3                     # p2 must show ext4; p3 must show NOTHING
+sudo bash scripts/nvme-partition.sh 
 ```
 
 `blkid` printing nothing for `p3` is required: rook provisions an unformatted device
@@ -205,13 +192,7 @@ is mostly zeros — the raw `p3` and the unused portion of `p2` dominate, so the
 ratio is very high; at no point is a 2TB file written to local disk):
 
 ```bash
-sudo mkdir -p /mnt/nas
-sudo mount -t nfs 10.0.0.50:/volume1/images /mnt/nas
-
-# NVMe read → compress (all cores) → push over NFS
-sudo dd if=/dev/nvme0n1 bs=4M | sudo zstd -T0 -o /mnt/nas/rpi5-nvme-golden.img.zst
-sudo sha256sum /mnt/nas/rpi5-nvme-golden.img.zst | sudo tee /mnt/nas/rpi5-nvme-golden.img.zst.sha256
-sync
+sudo bash scripts/nvme-snapshot.sh 
 ```
 
 The full-disk read is the dominant cost (a couple of minutes at NVMe speed); what traverses
@@ -236,34 +217,14 @@ hostnamectl                 # must be storage-2
 If anything looks wrong, stop and roll back (SD card). Otherwise run the standard node
 preparation (works unchanged — `cmdline.txt` now lives on the NVMe `p1`):
 
-```bash
-sudo bash node-prepare.sh
-sudo reboot
-```
 
 ### Step 9 — Join the cluster again
 
-On the control plane, generate a fresh join config (see `Makefile`):
-
-```bash
-./scripts/join-config.sh   # writes config/kubeadm-join.storage.yaml (fresh token + ca-hash)
-```
-
-Copy it to the node and join:
-
-```bash
-sudo bash node.sh 'config/kubeadm-join.storage.yaml'
-```
-
-Verify on the control plane that the node is back as `Ready` with the storage label/taint:
-
-```bash
-kubectl get nodes -l node.mmontes.io/type=storage
-```
+Refer to the [main README.md](../README.md).
 
 ### Step 10 — Rook OSD migration
 
-Precondition: the companion PR in `mmontes11/k8s-infrastructure`, which switches
+Precondition: the [companion PR](https://github.com/mmontes11/k8s-infrastructure/pull/108) in `mmontes11/k8s-infrastructure`, which switches
 `storage-2`'s device entry from `nvme0n1` to `nvme0n1p3` in
 `infrastructure/rook/rook-ceph-cluster/rook-ceph-cluster-helmrelease.yaml`, **is merged and
 applied by Flux** before this step.
@@ -310,19 +271,13 @@ applied by Flux** before this step.
 1. **Pre-flight**: per safety rule 2, the cluster must be converged with no missing OSDs.
 2. **Take the node out**: `kubectl drain <node> ...`, power off, keep its original SD card.
 3. **Stage**: fresh (or re-imaged) SD card per Step 3. No USB stick is needed — the image
-   comes over the network: the NFS export is writable/readable from any IP in `10.0.0.0/24`.
+   comes over the network: the NFS export is writable/readable from any IP in `10.0.0.0/26`.
 4. **Pull, verify and restore the image onto the NVMe** (no rpi-imager, no partition
    surgery; the compressed stream is pulled over NFS and decompressed in the pipeline
    straight onto the NVMe — nothing lands on local disk as a 2TB image):
 
    ```bash
-   sudo mkdir -p /mnt/nas
-   sudo mount -t nfs 10.0.0.50:/volume1/images /mnt/nas
-   sudo sha256sum -c /mnt/nas/rpi5-nvme-golden.img.zst.sha256
-
-   # NFS read → decompress (all cores) → NVMe write
-   sudo zstd -dc /mnt/nas/rpi5-nvme-golden.img.zst | sudo dd of=/dev/nvme0n1 bs=4M status=progress
-   sync
+   sudo bash scripts/nvme-snapshot-restore.sh 
    ```
 
 5. **Per-node configuration**: the golden's `p1` still carries `storage-2`'s hostname and
@@ -353,7 +308,7 @@ If a newly created OSD ends up in a bad state and you want to start it over, wip
 partition and let rook re-provision it:
 
 ```bash
-sudo bash scripts/cleanup-nvme.sh          # default target: /dev/nvme0n1p3
+sudo bash scripts/nvme-cleanup.sh          # default target: /dev/nvme0n1p3
 ```
 
 The script performs no checks — it zeroes the start of the target partition, discards it,
@@ -373,7 +328,7 @@ anything goes wrong:
    `config/kubeadm-join.storage.yaml` if it dropped out of the cluster.
 3. Rook still expects `nvme0n1`; if you already merged the `nvme0n1p3` change, revert that
    entry (Flux will apply it) and the old whole-disk device is valid again — then wipe it
-   first with `scripts/cleanup-nvme.sh /dev/nvme0n1`, because the image/partition surgery
+   first with `scripts/nvme-cleanup.sh /dev/nvme0n1`, because the image/partition surgery
    destroyed the old OSD data. If you already removed the old OSD id in Step 10
    (`ceph osd rm` or `rook purge-osd`), it is gone from the cluster: with two healthy
    OSDs the data is safe, but re-plan the migration instead of hot-fixing.
