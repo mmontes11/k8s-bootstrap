@@ -191,7 +191,7 @@ SSH in and verify the layout is intact (first-boot auto-grow only extends the fi
 lsblk /dev/nvme0n1
 df -h /                    # on nvme0n1p2, ≈120G (the 124G fs) — or more if first-boot auto-grow extended it to the full 128GiB partition
 blkid /dev/nvme0n1p3       # must print nothing
-hostnamectl                 # must be storage-2
+hostnamectl                # must be storage-2
 ```
 
 If anything looks wrong, stop and roll back (SD card). Otherwise run the standard node
