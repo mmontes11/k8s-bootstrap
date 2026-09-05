@@ -10,7 +10,7 @@ mkdir -p /mnt/nas
 mount -t nfs ${NAS} /mnt/nas
 
 # NVMe read → compress (all cores) → push over NFS
-dd if=${DEV} bs=4M status=progress | zstd -T0 -o /mnt/nas/${IMG} 
+dd if=${DEV} bs=4M status=progress | zstd -v -T0 ${DEV} -o /mnt/nas/${IMG}
 sha256sum /mnt/nas/${IMG} | tee /mnt/nas/${IMG}.sha256
 sync
 

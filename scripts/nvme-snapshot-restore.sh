@@ -11,7 +11,7 @@ mount -t nfs ${NAS} /mnt/nas
 
 sha256sum -c /mnt/nas/${IMG}.sha256
 # NFS read → decompress (all cores) → NVMe write
-zstd -dc /mnt/nas/${IMG} | dd of=${DEV} bs=4M status=progress
+zstd -v -dc /mnt/nas/${IMG} | dd of=${DEV} bs=4M status=progress
 sync
 
 umount /mnt/nas
