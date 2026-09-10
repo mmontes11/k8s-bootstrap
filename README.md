@@ -67,6 +67,31 @@ SKIP_KUBEADM_JOIN="true" \
 bash node.sh
 ```
 
+### Rotate worker node certificates
+
+Worker nodes join the Talos control-plane as Ubuntu machines. Their kubelet
+client certificate is a copy of the control-plane's, taken at join time, and it
+does not track later control-plane certificate rotations. When that copy
+expires the kubelet can no longer authenticate: the node goes `NotReady` and
+`KubeClientCertificateExpiration` alerts fire against the control-plane.
+
+Talos keeps the control-plane certificates current on its own (they are rotated
+on upgrade and config changes), so rotating a worker is just re-copying the
+current control-plane certificates to the node and restarting its kubelet.
+
+Regenerate the worker's certificates from the control-plane and restart the
+kubelet:
+
+```bash
+TALOS_CONTROLPLANE=<host> \
+TARGET_NODE=<host> \
+./scripts/talos-rotate.sh
+```
+
+The script prints the new client certificate's subject and `notAfter` before it
+installs anything — confirm the expiry is in the future. Repeat on each worker
+node. The kubelet is restarted, so expect a few seconds of node `NotReady`.
+
 ### Upgrade worker node
 
 Run the following commands to upgrade containerd and kubelet in a worker node:
