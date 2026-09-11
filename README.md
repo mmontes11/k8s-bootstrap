@@ -67,20 +67,53 @@ SKIP_KUBEADM_JOIN="true" \
 bash node.sh
 ```
 
-### Rotate worker node certificates
+### Renew a worker node's kubelet client certificate
 
-Worker nodes join the Talos control-plane as Ubuntu machines. Their kubelet
-client certificate is a copy of the control-plane's, taken at join time, and it
-does not track later control-plane certificate rotations. When that copy
-expires the kubelet can no longer authenticate: the node goes `NotReady` and
-`KubeClientCertificateExpiration` alerts fire against the control-plane.
+Worker nodes join the Talos control-plane as Ubuntu machines. On join, the
+kubelet performs TLS bootstrap and mints its **own** node client certificate
+(subject `O=system:nodes, CN=system:node:<name>`), signed by the cluster CA.
+Together with its private key it is stored combined in
+`/var/lib/kubelet/pki/kubelet-client-current.pem` and is valid for one year.
 
-Talos keeps the control-plane certificates current on its own (they are rotated
-on upgrade and config changes), so rotating a worker is just re-copying the
-current control-plane certificates to the node and restarting its kubelet.
+This certificate is **not** a copy of the control-plane certificate and does not
+track control-plane rotations. It is the node's own identity and expires on its
+own schedule. On some kubelet versions the kubelet does not rotate it by itself
+(the serving certificate, stored the same way, is rotated; the client certificate
+is not). When it expires the kubelet can no longer authenticate to the API
+server: the node goes `NotReady` and `KubeClientCertificateExpiration` fires
+against the control-plane.
 
-Regenerate the worker's certificates from the control-plane and restart the
-kubelet:
+Renew it through the Certificates API. The script re-uses the node's existing
+private key and subject, so the renewal is auto-approved as the same node
+identity (no manual approval needed), installs the new certificate in the same
+combined layout and restarts the kubelet. It is idempotent and the private key
+never leaves the node:
+
+```bash
+TARGET_NODE=<host> ./scripts/kubelet-client-rotate.sh
+```
+
+Useful variations:
+
+```bash
+# Validate the mechanism on one node first: submits (and then deletes) the
+# certificate request, confirms it is signed, but does not touch the kubelet.
+TARGET_NODE=<host> DRY_RUN=1 ./scripts/kubelet-client-rotate.sh
+
+# Override the k8s node name (defaults to the node's hostname).
+TARGET_NODE=<host> NODE_NAME=<k8s-node-name> ./scripts/kubelet-client-rotate.sh
+```
+
+The script prints the old and new certificate subject and `notAfter` so you can
+confirm the expiry moved into the future. Repeat on each worker node. The
+kubelet is restarted, so expect a few seconds of node `NotReady` (running pods
+are briefly rescheduled off the node and back).
+
+### Re-copy control-plane certificates to a worker node
+
+If a worker node's copies of the control-plane CA and kubelet kubeconfig have
+drifted (for example after a control-plane certificate rotation), re-copy the
+current control-plane certificates to the node and restart its kubelet:
 
 ```bash
 TALOS_CONTROLPLANE=<host> \
@@ -88,9 +121,10 @@ TARGET_NODE=<host> \
 ./scripts/talos-rotate.sh
 ```
 
-The script prints the new client certificate's subject and `notAfter` before it
-installs anything — confirm the expiry is in the future. Repeat on each worker
-node. The kubelet is restarted, so expect a few seconds of node `NotReady`.
+This refreshes `/etc/kubernetes/kubelet.conf`, the bootstrap kubelet
+kubeconfig and `ca.crt` only. It does **not** renew the node's own
+TLS-bootstrap client certificate described above -- use
+`./scripts/kubelet-client-rotate.sh` for that.
 
 ### Upgrade worker node
 

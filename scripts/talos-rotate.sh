@@ -2,19 +2,22 @@
 
 set -euo pipefail
 
-# Rotate the kubelet certificate on a worker node that was provisioned with
-# scripts/talos-config.sh.
+# Re-copy the current control-plane certificates and kubeconfigs to a worker
+# node that was provisioned with scripts/talos-config.sh.
 #
-# Worker nodes do not run Talos; their kubelet authenticates to the cluster
-# with the certificate that scripts/talos-config.sh copied from the Talos
-# control-plane. When the control-plane rotates that certificate (for example
-# after a Talos upgrade that re-issued the control-plane certificates), the
-# worker nodes keep holding the old copy until it is refreshed. This is what
-# the KubeClientCertificateExpiration alert warns about.
+# scripts/talos-config.sh copies the control-plane kubelet kubeconfig, the
+# bootstrap kubeconfig and the CA to the node at join time. If those drift
+# (for example after a Talos upgrade that re-issued the control-plane
+# certificates), this script re-pulls the current versions from the
+# control-plane, installs them on the target node and restarts the kubelet.
 #
-# This script re-pulls the current kubelet kubeconfig, bootstrap kubeconfig and
-# CA from the control-plane, installs them on the target node and restarts the
-# kubelet so it picks up the rotated certificate.
+# NOTE: this does NOT renew the node's own TLS-bootstrap client certificate
+# (the one the kubelet minted on join, stored in
+# /var/lib/kubelet/pki/kubelet-client-current.pem). That certificate is the
+# node's own identity, expires on its own one-year schedule and is what
+# KubeClientCertificateExpiration usually refers to. Renew it with:
+#
+#   TARGET_NODE=<host> ./scripts/kubelet-client-rotate.sh
 #
 # Prerequisites:
 #   - kubectl and talosctl are both pointed at $TALOS_CONTROLPLANE.
