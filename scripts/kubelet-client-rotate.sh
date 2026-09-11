@@ -24,11 +24,17 @@ set -euo pipefail
 # What this script does
 # ---------------------
 # It renews that client certificate through the Certificates API, reusing the
-# node's existing private key. Because the renewal re-uses the same key and the
-# same subject, kube-controller-manager auto-approves it as the same node
-# identity (no manual approval required). The new certificate is installed on the
-# node in the same combined file layout the node was provisioned with, and the
-# kubelet is restarted so it presents the fresh certificate.
+# node's existing private key and subject (both embedded in the certificate
+# request). It then approves the request explicitly and installs the signed
+# certificate on the node in the same combined file layout the node was
+# provisioned with, and restarts the kubelet so it presents the fresh
+# certificate.
+#
+# Note on approval: the built-in node client auto-approver only fires for a
+# request submitted by the node's own identity. A request created on the node's
+# behalf by an operator's kubectl is NOT auto-approved, so this script approves
+# it explicitly (kubectl certificate approve). Reusing the node's existing key is
+# what makes the signed certificate a valid renewal of that node's identity.
 #
 # The private key never leaves the node. Only the public certificate request and
 # the resulting public certificate are copied to the workstation.
@@ -38,8 +44,9 @@ set -euo pipefail
 #
 # Prerequisites
 # -------------
-#   - kubectl pointed at the cluster, with permission to create and read
-#     certificatesigningrequests (cluster-admin, or a role granting those verbs).
+#   - kubectl pointed at the cluster, with permission to create, read and
+#     approve certificatesigningrequests (cluster-admin, or a role granting
+#     those verbs on certificatesigningrequests / certificatesigningrequests/approve).
 #   - Passwordless root ssh to the target node.
 #   - The node is currently a known node object in the cluster.
 #
@@ -180,6 +187,10 @@ echo "Renewal subject: CN=${CN}, O=${ORG}"
 CSR_NAME="kubelet-client-$(printf '%s' "$NODE_NAME" | tr -c 'a-z0-9-' '-')-$(date +%s)"
 REQUEST_B64="$(base64 < "$WORKDIR/renewal.csr" | tr -d '\n')"
 
+# The subject (O=system:nodes, CN=system:node:<name>) is already embedded in the
+# certificate request PEM, so it must NOT be repeated here -- the
+# CertificateSigningRequestSpec has no "subject" field and the apiserver rejects
+# the manifest if one is present.
 cat > "$WORKDIR/csr.yaml" <<EOF
 apiVersion: certificates.k8s.io/v1
 kind: CertificateSigningRequest
@@ -190,36 +201,34 @@ spec:
   signerName: kubernetes.io/kube-apiserver-client
   usages:
     - client auth
-  subject:
-    commonName: "$CN"
-    organization:
-      - "$ORG"
 EOF
 
 echo "Submitting certificate request $CSR_NAME ..."
 kubectl apply -f "$WORKDIR/csr.yaml" >/dev/null
 
-# --- 5) wait for it to be approved and signed --------------------------------
+# --- 5) approve the request and wait for it to be signed ---------------------
 
-echo "Waiting for $CSR_NAME to be approved and signed ..."
+# The built-in node client auto-approver only fires for a request submitted by
+# the node's own identity; one created by an operator's kubectl is not, so we
+# approve it explicitly. Reusing the node's key makes the signed certificate a
+# valid renewal of that node's identity.
+echo "Approving certificate request $CSR_NAME ..."
+kubectl certificate approve "$CSR_NAME" >/dev/null 2>&1 || \
+  die "could not approve CSR $CSR_NAME (needs the 'approve' verb on certificatesigningrequests)."
+
+echo "Waiting for $CSR_NAME to be signed ..."
 CERT_B64=""
-for _ in $(seq 1 40); do
+for _ in $(seq 1 60); do
   CERT_B64="$(kubectl get csr "$CSR_NAME" -o jsonpath='{.status.certificate}' 2>/dev/null || true)"
   [[ -n "$CERT_B64" ]] && break
   sleep 1
 done
 
+# if the signer refused (e.g. key/subject mismatch), surface the reason
 if [[ -z "$CERT_B64" ]]; then
-  echo "Not auto-approved within 40s. Attempting manual approval (requires permission) ..."
-  kubectl certificate approve "$CSR_NAME" >/dev/null 2>&1 || \
-    die "CSR $CSR_NAME was not approved and manual approval failed (check permissions)."
-  for _ in $(seq 1 20); do
-    CERT_B64="$(kubectl get csr "$CSR_NAME" -o jsonpath='{.status.certificate}' 2>/dev/null || true)"
-    [[ -n "$CERT_B64" ]] && break
-    sleep 1
-  done
+  kubectl get csr "$CSR_NAME" -o json 2>/dev/null | \
+    jq -r '.status.conditions[]? | "\(.type): \(.reason) - \(.message)"' 2>/dev/null || true
 fi
-
 [[ -n "$CERT_B64" ]] || die "CSR $CSR_NAME was not signed in time."
 
 printf '%s' "$CERT_B64" | base64 -d > "$WORKDIR/new-cert.pem"

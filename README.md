@@ -84,10 +84,14 @@ server: the node goes `NotReady` and `KubeClientCertificateExpiration` fires
 against the control-plane.
 
 Renew it through the Certificates API. The script re-uses the node's existing
-private key and subject, so the renewal is auto-approved as the same node
-identity (no manual approval needed), installs the new certificate in the same
-combined layout and restarts the kubelet. It is idempotent and the private key
-never leaves the node:
+private key and subject (both embedded in the certificate request), submits the
+request, **approves it explicitly** and installs the signed certificate in the
+same combined layout, then restarts the kubelet. (The built-in node client
+auto-approver only fires for a request submitted by the node's own identity; one
+created by an operator's kubectl is not, so the script approves it itself -- this
+needs the `approve` permission on `certificatesigningrequests`, i.e.
+cluster-admin or a role granting it.) It is idempotent and the private key never
+leaves the node:
 
 ```bash
 TARGET_NODE=<host> ./scripts/kubelet-client-rotate.sh
