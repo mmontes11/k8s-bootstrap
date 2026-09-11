@@ -99,17 +99,15 @@ ssh_node() {
     "root@${TARGET_NODE}" "$@"
 }
 
-die() {
+error() {
   echo "Error: $*" >&2
-  # best-effort cleanup of any remote temp dir we created
-  [[ -n "${REMOTE_WORK:-}" ]] && ssh_node "rm -rf '${REMOTE_WORK}'" >/dev/null 2>&1 || true
   exit 1
 }
 
 # --- 0) kubectl must reach the cluster ---------------------------------------
 
-kubectl version --client >/dev/null 2>&1 || die "kubectl is not installed."
-kubectl get nodes >/dev/null 2>&1 || die "kubectl cannot reach the cluster (check your context)."
+kubectl version --client >/dev/null 2>&1 || error "kubectl is not installed."
+kubectl get nodes >/dev/null 2>&1 || error "kubectl cannot reach the cluster (check your context)."
 
 # --- 1) resolve the k8s node name --------------------------------------------
 
@@ -117,10 +115,10 @@ if [[ -z "$NODE_NAME" ]]; then
   NODE_NAME="$(ssh_node 'hostname')"
 fi
 NODE_NAME="${NODE_NAME:-}"
-[[ -n "$NODE_NAME" ]] || die "could not determine the node name (set NODE_NAME)."
+[[ -n "$NODE_NAME" ]] || error "could not determine the node name (set NODE_NAME)."
 
 if ! kubectl get node "$NODE_NAME" >/dev/null 2>&1; then
-  die "node '$NODE_NAME' is not registered in the cluster (kubectl)."
+  error "node '$NODE_NAME' is not registered in the cluster (kubectl)."
 fi
 
 CLIENT_PEM="/var/lib/kubelet/pki/kubelet-client-current.pem"
@@ -145,10 +143,9 @@ ssh_node "openssl x509 -in '$CLIENT_PEM' -noout -subject -dates"
 # --- 3) on the node: keep the key, build a renewal CSR with the same key ------
 
 WORKDIR="$(mktemp -d)"
-trap 'rm -rf "$WORKDIR"' EXIT
-REMOTE_WORK="$(ssh_node 'mktemp -d -t kubelet-client-rotate.XXXXXX')" || die "could not create a temp dir on the node."
+REMOTE_WORK="$(ssh_node 'mktemp -d -t kubelet-client-rotate.XXXXXX')" || error "could not create a temp dir on the node."
 
-ssh_node bash -s -- "$REMOTE_WORK" <<'REMOTE_SETUP' || die "failed to build the renewal certificate request on the node."
+ssh_node bash -s -- "$REMOTE_WORK" <<'REMOTE_SETUP' || error "failed to build the renewal certificate request on the node."
   set -euo pipefail
   remote_work="$1"
   client_pem=/var/lib/kubelet/pki/kubelet-client-current.pem
@@ -214,7 +211,7 @@ kubectl apply -f "$WORKDIR/csr.yaml" >/dev/null
 # valid renewal of that node's identity.
 echo "Approving certificate request $CSR_NAME ..."
 kubectl certificate approve "$CSR_NAME" >/dev/null 2>&1 || \
-  die "could not approve CSR $CSR_NAME (needs the 'approve' verb on certificatesigningrequests)."
+  error "could not approve CSR $CSR_NAME (needs the 'approve' verb on certificatesigningrequests)."
 
 echo "Waiting for $CSR_NAME to be signed ..."
 CERT_B64=""
@@ -229,7 +226,7 @@ if [[ -z "$CERT_B64" ]]; then
   kubectl get csr "$CSR_NAME" -o json 2>/dev/null | \
     jq -r '.status.conditions[]? | "\(.type): \(.reason) - \(.message)"' 2>/dev/null || true
 fi
-[[ -n "$CERT_B64" ]] || die "CSR $CSR_NAME was not signed in time."
+[[ -n "$CERT_B64" ]] || error "CSR $CSR_NAME was not signed in time."
 
 printf '%s' "$CERT_B64" | base64 -d > "$WORKDIR/new-cert.pem"
 
@@ -241,8 +238,6 @@ openssl x509 -in "$WORKDIR/new-cert.pem" -noout -subject -dates
 if [[ "$DRY_RUN" == "1" ]]; then
   echo "DRY_RUN=1: new certificate was signed successfully. Not installing; leaving the node untouched."
   kubectl delete csr "$CSR_NAME" --ignore-not-found >/dev/null 2>&1 || true
-  ssh_node "rm -rf '$REMOTE_WORK'" >/dev/null 2>&1 || true
-  REMOTE_WORK=""
   exit 0
 fi
 
@@ -254,7 +249,7 @@ NEW_FILE="/var/lib/kubelet/pki/kubelet-client-${TS}.pem"
 echo "Installing $NEW_FILE on $TARGET_NODE ..."
 scp -q "$WORKDIR/new-cert.pem" "root@${TARGET_NODE}:${REMOTE_WORK}/new-cert.pem"
 
-ssh_node bash -s -- "$REMOTE_WORK" "$NEW_FILE" <<'REMOTE_INSTALL' || die "failed to install the new certificate on the node."
+ssh_node bash -s -- "$REMOTE_WORK" "$NEW_FILE" <<'REMOTE_INSTALL' || error "failed to install the new certificate on the node."
   set -euo pipefail
   remote_work="$1"; new_file="$2"
 
@@ -273,11 +268,9 @@ ssh_node bash -s -- "$REMOTE_WORK" "$NEW_FILE" <<'REMOTE_INSTALL' || die "failed
   echo "Installed client certificate:"
   openssl x509 -in /var/lib/kubelet/pki/kubelet-client-current.pem -noout -subject -dates
 
-  # shred the private key, then drop the temp dir
+  # shred the temp copy of the private key (the temp dir is left in /tmp)
   shred -u "$remote_work/key.pem" 2>/dev/null || rm -f "$remote_work/key.pem"
-  rm -rf "$remote_work"
 REMOTE_INSTALL
-REMOTE_WORK=""
 
 # --- 7) confirm the node is Ready and tidy up the certificate request --------
 
