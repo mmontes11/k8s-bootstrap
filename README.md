@@ -113,23 +113,6 @@ confirm the expiry moved into the future. Repeat on each worker node. The
 kubelet is restarted, so expect a few seconds of node `NotReady` (running pods
 are briefly rescheduled off the node and back).
 
-### Re-copy control-plane certificates to a worker node
-
-If a worker node's copies of the control-plane CA and kubelet kubeconfig have
-drifted (for example after a control-plane certificate rotation), re-copy the
-current control-plane certificates to the node and restart its kubelet:
-
-```bash
-TALOS_CONTROLPLANE=<host> \
-TARGET_NODE=<host> \
-./scripts/talos-rotate.sh
-```
-
-This refreshes `/etc/kubernetes/kubelet.conf`, the bootstrap kubelet
-kubeconfig and `ca.crt` only. It does **not** renew the node's own
-TLS-bootstrap client certificate described above -- use
-`./scripts/kubelet-client-rotate.sh` for that.
-
 ### Upgrade worker node
 
 Run the following commands to upgrade containerd and kubelet in a worker node:
