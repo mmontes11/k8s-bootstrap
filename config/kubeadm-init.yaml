@@ -9,7 +9,7 @@ nodeRegistration:
 apiVersion: kubeadm.k8s.io/v1beta4
 kind: ClusterConfiguration
 # TODO: sync with scripts/kubernetes.sh
-kubernetesVersion: v1.31.0
+kubernetesVersion: v1.37.0
 clusterName: homelab
 caCertificateValidityPeriod: 87600h0m0s # 10 years
 certificateValidityPeriod: 8760h0m0s # 1 year
