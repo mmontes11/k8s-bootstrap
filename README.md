@@ -75,8 +75,7 @@ sudo \
 UPGRADE="1" \
 CONTAINERD_VERSION="2.4.1-2~ubuntu.24.04~noble" \
 bash scripts/containerd.sh
-```
-```bash
+
 sudo \
 UPGRADE="1" \
 KUBERNETES_VERSION="v1.37" \
