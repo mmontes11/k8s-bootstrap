@@ -15,7 +15,7 @@ if [ -z "$ARCH" ]; then
   exit 1
 fi
 
-CONTAINERD_VERSION=${CONTAINERD_VERSION:-2.2.1-1~ubuntu.24.04~noble}
+CONTAINERD_VERSION=${CONTAINERD_VERSION:-2.4.1-2~ubuntu.24.04~noble}
 
 if [ -n "${UPGRADE:-}" ]; then
   echo "🛑 Stopping kubelet..."

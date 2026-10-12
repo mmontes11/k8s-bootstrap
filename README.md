@@ -120,14 +120,14 @@ Run the following commands to upgrade containerd and kubelet in a worker node:
 ```bash
 sudo \
 UPGRADE="1" \
-CONTAINERD_VERSION="2.2.1-1~ubuntu.24.04~noble" \
+CONTAINERD_VERSION="2.4.1-2~ubuntu.24.04~noble" \
 bash scripts/containerd.sh
 ```
 ```bash
 sudo \
 UPGRADE="1" \
-KUBERNETES_VERSION="v1.35" \
-KUBERNETES_PKG="1.35.0-1.1" \
+KUBERNETES_VERSION="v1.37" \
+KUBERNETES_PKG=" 1.37.1-1.1" \
 bash scripts/kubernetes.sh
 ``` 
 
