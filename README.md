@@ -66,6 +66,31 @@ sudo \
 SKIP_KUBEADM_JOIN="true" \
 bash node.sh
 ```
+### Upgrade worker node
+
+Run the following commands to upgrade containerd and kubelet in a worker node:
+
+```bash
+sudo \
+UPGRADE="1" \
+CONTAINERD_VERSION="2.4.1-2~ubuntu.24.04~noble" \
+bash scripts/containerd.sh
+```
+```bash
+sudo \
+UPGRADE="1" \
+KUBERNETES_VERSION="v1.37" \
+KUBERNETES_PKG="1.37.1-1.1" \
+bash scripts/kubernetes.sh
+``` 
+
+### Kubeconfig
+
+`admin` and `super-admin` kubeconfigs are available in the following control-plane paths:
+- `/etc/kubernetes/admin.conf`
+- `/etc/kubernetes/super-admin.conf`
+
+This [article](https://raesene.github.io/blog/2024/01/06/when-is-admin-not-admin/) depicts the differences between them.
 
 ### Renew a worker node's kubelet client certificate
 
@@ -112,32 +137,6 @@ The script prints the old and new certificate subject and `notAfter` so you can
 confirm the expiry moved into the future. Repeat on each worker node. The
 kubelet is restarted, so expect a few seconds of node `NotReady` (running pods
 are briefly rescheduled off the node and back).
-
-### Upgrade worker node
-
-Run the following commands to upgrade containerd and kubelet in a worker node:
-
-```bash
-sudo \
-UPGRADE="1" \
-CONTAINERD_VERSION="2.4.1-2~ubuntu.24.04~noble" \
-bash scripts/containerd.sh
-```
-```bash
-sudo \
-UPGRADE="1" \
-KUBERNETES_VERSION="v1.37" \
-KUBERNETES_PKG=" 1.37.1-1.1" \
-bash scripts/kubernetes.sh
-``` 
-
-### Kubeconfig
-
-`admin` and `super-admin` kubeconfigs are available in the following control-plane paths:
-- `/etc/kubernetes/admin.conf`
-- `/etc/kubernetes/super-admin.conf`
-
-This [article](https://raesene.github.io/blog/2024/01/06/when-is-admin-not-admin/) depicts the differences between them.
 
 ### Raspberry Pi 5 NVMe storage nodes
 
