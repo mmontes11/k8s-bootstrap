@@ -25,6 +25,14 @@ function get_architecture() {
   fi
 }
 
+function is_raspberry_pi() {
+  # Detect Raspberry Pi hardware via the devicetree compatible string
+  # (e.g. "raspberrypi,5-model-b-plus"). The file is absent on non-Pi
+  # hardware, which is reported as false.
+  [ -r /sys/firmware/devicetree/base/compatible ] && \
+    grep -qi "raspberrypi," /sys/firmware/devicetree/base/compatible
+}
+
 function install_bin() {
   BIN=$1
   URL=$2
