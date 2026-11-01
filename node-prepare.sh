@@ -2,10 +2,15 @@
 
 set -euo pipefail
 
-#!/bin/bash
+source ./scripts/lib.sh
 
-# Kubernetes-required cgroup parameters:
-if grep -q "cgroup_enable=cpuset" /boot/firmware/cmdline.txt &&
+# The Raspberry Pi firmware reads /boot/firmware/cmdline.txt, while other
+# Ubuntu nodes set the kernel cmdline through GRUB (/etc/default/grub) and the
+# file does not exist. Apply the cgroup and NVMe/PCIe boot parameters only on
+# Raspberry Pi nodes.
+if ! is_raspberry_pi; then
+   echo "Boot parameters skipped: not a Raspberry Pi node"
+elif grep -q "cgroup_enable=cpuset" /boot/firmware/cmdline.txt &&
    grep -q "cgroup_enable=memory" /boot/firmware/cmdline.txt &&
    grep -q "cgroup_memory=1" /boot/firmware/cmdline.txt &&
    grep -q "cgroup_enable=hugetlb" /boot/firmware/cmdline.txt &&
