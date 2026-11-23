@@ -296,6 +296,19 @@ re-probes, and removes `/var/lib/rook`. Pass a different device explicitly if th
 differs (e.g. the legacy whole-disk `nvme0n1` on a node that has not been migrated yet).
 You own the target argument.
 
+## Disk diagnostics (SMART / RMA)
+
+To capture NVMe health data for hardware fault analysis or an RMA claim (controller ID,
+SMART health log, error log) from the node itself:
+
+```bash
+sudo bash scripts/nvme-smart.sh          # default device: /dev/nvme0n1
+```
+
+The capture is written to `/tmp/nvme-smart-<serial>-<timestamp>.txt` (the serial comes from
+the drive) and printed. `nvme-cli` is installed on the node at preparation time by
+`scripts/storage.sh`.
+
 ## Rollback
 
 Before the node rejoins the cluster, all data lives on the two remaining OSDs at full

@@ -23,3 +23,8 @@ for i in "${!modules[@]}"; do
 done
 
 sysctl --system
+
+# disk utilities
+# nvme-cli is not part of the base image; the nodes need it for NVMe
+# diagnostics (SMART/error logs, RMA evidence — see scripts/nvme-smart.sh).
+apt install -y nvme-cli
